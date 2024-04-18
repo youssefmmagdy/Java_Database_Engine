@@ -258,50 +258,63 @@ public class DBApp {
 			}
 		}
 	}
-	//TODO : check for invalid column name
+
+	public boolean comparecolumname(Vector column,Hashtable<String, Object> htblColNameValue){
+		for (int i = 0; i < column.size(); i++) {
+			Vector c= (Vector) column.get(i);
+			if (!c.get(0).equals(htblColNameValue.containsKey(c.get(0)))){
+				return false;
+			}
+		}
+		return true;
+	}
 	public void insertIntoTable(String strTableName,
 								Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
 			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".class");
 			if (fileExists(f)) {
-				if (sizeCheck(htblColNameValue.size(), column.size())) {
-					if (tableDataTypeCheck(column, htblColNameValue)) {
-						String clusteringKey = clusteringKey_ID(column);
-						if (!clusteringKey.isEmpty()) {
-							Object Id = htblColNameValue.get(clusteringKey);
-							try {
-								if (binarySearch(strTableName, Id) == null) {
-									Table tab = null;
-									try {
-										tab = DeserializeTable(strTableName);
-									} catch (IOException | ClassNotFoundException e) {
-										throw new DBAppException("Deserialized Table Not found");
+				if(comparecolumname(column,htblColNameValue)) {
+					if (sizeCheck(htblColNameValue.size(), column.size())) {
+						if (tableDataTypeCheck(column, htblColNameValue)) {
+							String clusteringKey = clusteringKey_ID(column);
+							if (!clusteringKey.isEmpty()) {
+								Object Id = htblColNameValue.get(clusteringKey);
+								try {
+									if (binarySearch(strTableName, Id) == null) {
+										Table tab = null;
+										try {
+											tab = DeserializeTable(strTableName);
+										} catch (IOException | ClassNotFoundException e) {
+											throw new DBAppException("Deserialized Table Not found");
+										}
+										try {
+											tab.add(htblColNameValue);
+										} catch (IOException | ClassNotFoundException e) {
+											throw new DBAppException("Unable to add to table");
+										}
+										try {
+											addBPlussTree(tab, column, strTableName, clusteringKey, htblColNameValue);
+										} catch (IOException | ClassNotFoundException e) {
+											throw new DBAppException("Unable to add to B+ Tree");
+										}
+									} else {
+										throw new DBAppException("Duplicate insert Found");
 									}
-									try {
-										tab.add(htblColNameValue);
-									} catch (IOException | ClassNotFoundException e) {
-										throw new DBAppException("Unable to add to table");
-									}
-									try {
-										addBPlussTree(tab, column, strTableName, clusteringKey, htblColNameValue);
-									} catch (IOException | ClassNotFoundException e) {
-										throw new DBAppException("Unable to add to B+ Tree");
-									}
-								} else {
-									throw new DBAppException("Duplicate insert Found");
+								} catch (IOException | ClassNotFoundException e) {
+									throw new DBAppException("Failed to search for duplicate record");
 								}
-							} catch (IOException | ClassNotFoundException e) {
-								throw new DBAppException("Failed to search for duplicate record");
+							} else {
+								throw new DBAppException("No clustering key found");
 							}
 						} else {
-							throw new DBAppException("No clustering key found");
+							throw new DBAppException("Invalid Types");
 						}
 					} else {
-						throw new DBAppException("Invalid Types");
+						throw new DBAppException("Sizes do not match");
 					}
-				} else {
-					throw new DBAppException("Sizes do not match");
+				}else {
+					throw new DBAppException("Mismatch in type found");
 				}
 			} else {
 				throw new DBAppException("Invalid Input");
@@ -551,35 +564,27 @@ public class DBApp {
 	// htblColNameValue holds the key and value. This will be used in search
 	// to identify which rows/tuples to delete.
 	// htblColNameValue entries are ANDED together
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
-
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
-			Table deserializedTable = Deserialize.DeserializeTable(strTableName);
-			if(deserializedTable.getPageNames().isEmpty())
-				throw new DBAppException("Table is Empty");
-
-
-
-
-//
-//			boolean fag = true;
-//			for (Map.Entry<String, String> entry : htblColNameValue.entrySet()) {
-//				String key = entry.getKey();
-//				if (!key.equals()) {
-//				}else{
-//					fag = false;
-//				}
-//			}
-//			if(fag){
-//				throw new DBAppException("No ClusteringKeyInserted");
-//			}
-//
-
-
-
-
-			deserializedTable.deleteRows(htblColNameValue);
-			System.out.println("Deletion completed successfully.");
+			Vector column = columnNameReader(strTableName);
+			if (comparecolumname(column, htblColNameValue)){
+                Table deserializedTable = null;
+                try {
+                    deserializedTable = Deserialize.DeserializeTable(strTableName);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new DBAppException("Could not deserialize Table");
+                }
+                if (deserializedTable.getPageNames().isEmpty())
+					throw new DBAppException("Table is Empty");
+                try {
+                    deserializedTable.deleteRows(htblColNameValue);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new DBAppException("Table Not Found");
+                }
+                System.out.println("Deletion completed successfully.");
+			}else {
+				throw new DBAppException("Table Not Found");
+			}
 		} else {
 			throw new DBAppException("Table Not Found");
 		}
@@ -1012,11 +1017,11 @@ public class DBApp {
 //			dbApp.createIndex( strTableName, "id", "nameIndex" );
 
 
-//			Hashtable htblColNameValue = new Hashtable();
-//			htblColNameValue.put("id", "a1155");
-//			htblColNameValue.put("name", "Ibra");
-//			htblColNameValue.put("gpa",0.69);
-//			dbApp.insertIntoTable( strTableName , htblColNameValue );
+			Hashtable htblColNameValue = new Hashtable();
+			htblColNameValue.put("ID", "a1155");
+			htblColNameValue.put("name", "Ibra");
+			htblColNameValue.put("gpa",0.69);
+			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
 //			dbApp.updateTable("Student", "2", htblColNameValue);

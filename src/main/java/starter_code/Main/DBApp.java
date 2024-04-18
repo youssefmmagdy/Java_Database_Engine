@@ -20,7 +20,7 @@ public class DBApp {
 		init();
 		tables = new Vector<Table>();
 		for(String s : getTableNames("metadata.csv")){
-			File f = new File("starter_code/"+s+"/"+s+".ser");
+			File f = new File("starter_code/"+s+"/"+s+".class");
 			if(f.exists()&& !f.isDirectory()){
 				Table t = Deserialize.DeserializeTable(s);
 				tables.add(t);
@@ -111,7 +111,7 @@ public class DBApp {
 		if(!searchMetadata(strTableName)){
 			throw new DBAppException("Table Not Found");
 		}
-		File f1 = new File("starter_code/"+strTableName+"/"+strIndexName+".ser");
+		File f1 = new File("starter_code/"+strTableName+"/"+strIndexName+".class");
 		if(!f1.exists()) {
 			String csvFile = "metadata.csv";
 			try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
@@ -133,7 +133,7 @@ public class DBApp {
 						values[4] = strIndexName;
 						values[5] = "B+tree";
 
-						File f = new File(strTableName + strIndexName + ".ser");
+						File f = new File(strTableName + strIndexName + ".class");
 						if (!f.exists()) {
 							Table deserializedTable = Deserialize.DeserializeTable(strTableName);
 
@@ -244,7 +244,7 @@ public class DBApp {
 								Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
-			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".ser");
+			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".class");
 			if (fileExists(f)) {
 				if (sizeCheck(htblColNameValue.size(), column.size())) {
 					if (tableDataTypeCheck(column, htblColNameValue)) {
@@ -927,19 +927,19 @@ public class DBApp {
 			String in = "java.lang.Integer";
 			String dou = "java.lang.double";
 //
-			Hashtable htblColNameType = new Hashtable();
-			htblColNameType.put("id", st);
-			htblColNameType.put("name", st);
-			htblColNameType.put("gpa", dou);
-			dbApp.createTable( strTableName, "id", htblColNameType );
-			dbApp.createIndex( strTableName, "id", "nameIndex" );
+//			Hashtable htblColNameType = new Hashtable();
+//			htblColNameType.put("id", st);
+//			htblColNameType.put("name", st);
+//			htblColNameType.put("gpa", dou);
+//			dbApp.createTable( strTableName, "id", htblColNameType );
+//			dbApp.createIndex( strTableName, "id", "nameIndex" );
 
 
-			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("id", "a1155");
-			htblColNameValue.put("name", "joe");
-			htblColNameValue.put("gpa", (double)3.3);
-			dbApp.insertIntoTable( strTableName , htblColNameValue );
+//			Hashtable htblColNameValue = new Hashtable();
+//			htblColNameValue.put("id", "a1155");
+//			htblColNameValue.put("name", "joe");
+//			htblColNameValue.put("gpa", 3.3);
+//			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
 //			dbApp.updateTable("Student", "a11", htblColNameValue);

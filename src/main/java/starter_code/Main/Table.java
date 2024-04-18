@@ -262,7 +262,7 @@ public class Table implements Serializable,Iterator<Table> {
 
       update(p, primary);
 
-      File f = new File("starter_code/" + tableName + "/" + tableName + (p.getPageNumber()+1)+".ser");
+      File f = new File("starter_code/" + tableName + "/" + tableName + (p.getPageNumber()+1)+".class");
       if(!f.exists()){
         classicInsert(tbi.getHm(), primary);
       }else {
@@ -297,7 +297,7 @@ public class Table implements Serializable,Iterator<Table> {
 
       update(p, primary);
 
-      File f = new File("starter_code/" + tableName + "/" + tableName + (p.getPageNumber()+1)+".ser");
+      File f = new File("starter_code/" + tableName + "/" + tableName + (p.getPageNumber()+1)+".class");
       if(!f.exists()){
         classicInsert(r.getHm(), primary);
       }else {
@@ -371,7 +371,7 @@ public class Table implements Serializable,Iterator<Table> {
 
     if(htblColNameValue.size() == 0){
       while(pageNames.size() > 0){
-        File pageFile = new File("starter_code/" + tableName + "/" + pageNames.get(0) + ".ser");
+        File pageFile = new File("starter_code/" + tableName + "/" + pageNames.get(0) + ".class");
         pageFile.delete();
         pageNames.remove(pageNames.get(0));
       }
@@ -420,7 +420,7 @@ public class Table implements Serializable,Iterator<Table> {
               this.maxOfPages.remove(n);
               this.minOfPages.remove(n);
               pageNames.remove(record.getPageName());
-              File pageFile = new File("starter_code/" + tableName + "/" + record.getPageName() + ".ser");
+              File pageFile = new File("starter_code/" + tableName + "/" + record.getPageName() + ".class");
               pageFile.delete();
             } else {
               Serialize.Serializethis(record.getPageName(), page, tableName);
@@ -460,7 +460,7 @@ public class Table implements Serializable,Iterator<Table> {
           this.maxOfPages.remove(n);
           this.minOfPages.remove(n);
           pageNames.remove(record.getPageName());
-          File pageFile = new File("starter_code/" + tableName + "/" + record.getPageName() + ".ser");
+          File pageFile = new File("starter_code/" + tableName + "/" + record.getPageName() + ".class");
           pageFile.delete();
         } else {
           Serialize.Serializethis(record.getPageName(), i, tableName);
@@ -501,7 +501,7 @@ public class Table implements Serializable,Iterator<Table> {
             minOfPages.remove(n);
             pageNames.remove(pageName);
             numberOfRowsraw--;
-            File pageFile = new File("starter_code/" + tableName + "/" + pageName + ".ser");
+            File pageFile = new File("starter_code/" + tableName + "/" + pageName + ".class");
             pageFile.delete();
 
           } else if (pageModified) {

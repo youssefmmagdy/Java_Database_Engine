@@ -8,6 +8,8 @@ import starter_code.Serialization.Serialize;
 import java.io.*;
 import java.util.*;
 
+import static starter_code.Serialization.Deserialize.DeserializeTable;
+
 
 /** * @author Wael Abouelsaadat */
 
@@ -241,10 +243,10 @@ public class DBApp {
 	}
 
 	public void insertIntoTable(String strTableName,
-								Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
+								Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
-			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".class");
+			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".ser");
 			if (fileExists(f)) {
 				if (sizeCheck(htblColNameValue.size(), column.size())) {
 					if (tableDataTypeCheck(column, htblColNameValue)) {
@@ -252,25 +254,29 @@ public class DBApp {
 						if (!clusteringKey.isEmpty()) {
 							Object Id = htblColNameValue.get(clusteringKey);
 							//System.out.println(Id);
-							if (binarySearch(strTableName,Id) == null) {
-                                Table tab = null;
-                                try {
-                                    tab = Deserialize.DeserializeTable(strTableName);
-                                } catch (IOException | ClassNotFoundException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                try {
-                                    tab.add(htblColNameValue);
-                                } catch (IOException | ClassNotFoundException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                try {
-                                    addBPlussTree(tab, column, strTableName, clusteringKey,htblColNameValue);
-                                } catch (IOException | ClassNotFoundException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            } else {
-								throw new DBAppException("Duplicate insert Found");
+							try {
+								if (binarySearch(strTableName, Id) == null) {
+									Table tab = null;
+									try {
+										tab = DeserializeTable(strTableName);
+									} catch (IOException | ClassNotFoundException e) {
+										throw new DBAppException("Deseialized Table Not found");
+									}
+									try {
+										tab.add(htblColNameValue);
+									} catch (IOException | ClassNotFoundException e) {
+										throw new DBAppException("Unable to add to table");
+									}
+									try {
+										addBPlussTree(tab, column, strTableName, clusteringKey, htblColNameValue);
+									} catch (IOException | ClassNotFoundException e) {
+										throw new DBAppException("Unable to add to B+ Tree");
+									}
+								} else {
+									throw new DBAppException("Duplicate insert Found");
+								}
+							} catch (IOException | ClassNotFoundException e) {
+								throw new DBAppException("Failed to search for duplicate record");
 							}
 						} else {
 							throw new DBAppException("No clustering key found");

@@ -535,7 +535,7 @@ public class Table implements Serializable,Iterator<Table> {
         break;
       }
     }
-    for(int i = 1;i<p.getTuples().size();i++){
+    for(int i = 0;i<p.getTuples().size();i++){
       Record re = p.getTuples().get(i);
       if(!re.isNull){
         p.setMin(re.getHm().get(primary));
@@ -584,7 +584,7 @@ public class Table implements Serializable,Iterator<Table> {
 
 //    System.out.println(Deserialize.DeserializeTable("Student"));
 //    System.out.println(getIndexedColumns(columnNameReader("Student")));
-//Table t = Deserialize.DeserializeTable("Student");
+Table t = Deserialize.DeserializeTable("Student");
 //t.getPageNames();
 //System.out.println(t);
 

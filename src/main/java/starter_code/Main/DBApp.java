@@ -5,6 +5,7 @@ import starter_code.Exception.DBAppException;
 import starter_code.Serialization.Deserialize;
 import starter_code.Serialization.Serialize;
 
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import java.io.*;
 import java.util.*;
 
@@ -72,34 +73,50 @@ public class DBApp {
 
 	public void createTable(String strTableName,
 							String strClusteringKeyColumn,
-							Hashtable<String,String> htblColNameType) throws IOException, DBAppException {
+							Hashtable<String,String> htblColNameType) throws DBAppException {
 		File f = new File("starter_code/"+strTableName);
 		if(!f.exists()) {
+
+			boolean fag = true;
 			for (Map.Entry<String, String> entry : htblColNameType.entrySet()) {
-				String value = entry.getValue();if(!value.equals("java.lang.String")&&!(value.equals("java.lang.double")|value.equals("java.lang.Double"))&&!value.equals("java.lang.Integer")){
-					throw new DBAppException(value + " is an invalid data type");
-				}}
-			Table newt = new Table(strTableName);
-			String folderPath = "starter_code/"+strTableName;
-			File folder = new File(folderPath);
-			folder.mkdirs();
-			tables.add(newt);
-			Serialize.Serializethis(strTableName, newt, strTableName);
-			FileWriter fileWriter = new FileWriter("metadata.csv", true);
-			StringBuilder line = new StringBuilder();
-			line.append("\n");
-			line.append(strTableName).append(',').append(strClusteringKeyColumn).append(',').append(htblColNameType.get(strClusteringKeyColumn)).append(',').append("True").append(',').append("null").append(',').append("null");
-			line.append("\n");
-			for (Map.Entry<String, String> entry : htblColNameType.entrySet()) {
-				String key = entry.getKey();
 				String value = entry.getValue();
-				if (!key.equals(strClusteringKeyColumn)) {
-					line.append(strTableName).append(',').append(key).append(',').append(value).append(',').append("False").append(',').append("null").append(',').append("null");
-					line.append("\n");
+				String key = entry.getKey();
+				if (key.equals(strClusteringKeyColumn)) {fag = false;}
+
+				if(!value.equals("java.lang.String")&&!(value.equals("java.lang.double")|value.equals("java.lang.Double"))&&!value.equals("java.lang.Integer")){
+					throw new DBAppException(value + " is an invalid data type");
 				}
 			}
-			fileWriter.write(line.toString());
-			fileWriter.close();
+			if(fag){
+				throw new DBAppException("No Clustering Key Inserted");
+			}
+			try{
+			Table newt = new Table(strTableName);
+				String folderPath = "starter_code/"+strTableName;
+				File folder = new File(folderPath);
+				folder.mkdirs();
+				tables.add(newt);
+				Serialize.Serializethis(strTableName, newt, strTableName);
+				FileWriter fileWriter = new FileWriter("metadata.csv", true);
+				StringBuilder line = new StringBuilder();
+				line.append("\n");
+				for (Map.Entry<String, String> entry : htblColNameType.entrySet()) {
+					String key = entry.getKey();
+					String value = entry.getValue();
+					if (!key.equals(strClusteringKeyColumn)) {
+						line.append(strTableName).append(',').append(key).append(',').append(value).append(',').append("False").append(',').append("null").append(',').append("null");
+						line.append("\n");
+					}else{
+						line.append(strTableName).append(',').append(key).append(',').append(value).append(',').append("True").append(',').append("null").append(',').append("null");
+						line.append("\n");
+					}
+				}
+				fileWriter.write(line.toString());
+				fileWriter.close();
+
+		} catch (IOException e) {
+			throw new DBAppException("Failed to create table");
+		}
 		}else{
 			throw new DBAppException(strTableName + " Table Already Exists");
 		}
@@ -241,7 +258,7 @@ public class DBApp {
 			}
 		}
 	}
-
+	//TODO : check for invalid column name
 	public void insertIntoTable(String strTableName,
 								Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
@@ -253,7 +270,6 @@ public class DBApp {
 						String clusteringKey = clusteringKey_ID(column);
 						if (!clusteringKey.isEmpty()) {
 							Object Id = htblColNameValue.get(clusteringKey);
-							//System.out.println(Id);
 							try {
 								if (binarySearch(strTableName, Id) == null) {
 									Table tab = null;
@@ -282,10 +298,10 @@ public class DBApp {
 							throw new DBAppException("No clustering key found");
 						}
 					} else {
-						throw new DBAppException("Invalid Input");
+						throw new DBAppException("Invalid Types");
 					}
 				} else {
-					throw new DBAppException("Invalid Input");
+					throw new DBAppException("Sizes do not match");
 				}
 			} else {
 				throw new DBAppException("Invalid Input");
@@ -435,6 +451,7 @@ public class DBApp {
 
 //			i.getTuples().set(index, record);
 			table.update(i, getPrimaryKey(strTableName));
+			i = Deserialize.DeserializePage(record.getPageName(), strTableName);
 			Serialize.Serializethis(i.getName(), i, strTableName);
 		}
 		else {
@@ -456,6 +473,31 @@ public class DBApp {
 		}
 		return -1;
 	}
+
+
+
+	public static Integer mayParse(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+	public static Double mayParse2(String str) {
+		try {
+			return Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+
+
+
+
+
+
+
 	public static Record binarySearch(String tableName , Object pk) throws DBAppException, IOException, ClassNotFoundException {
 		System.out.println(Deserialize.DeserializeTable(tableName)+""+pk);
 		try{
@@ -468,6 +510,14 @@ public class DBApp {
 			Vector<String> pageNames = table.getPageNames();
 			while(l<=r){
 				int mid = (l + r) / 2;
+
+
+				if (mayParse(""+ pk) != null) {
+					pk = mayParse(""+ pk);
+				} else if (mayParse2(""+ pk) != null) {
+					pk = mayParse2(""+ pk);
+				}
+
 				if(((Comparable) pk).compareTo(maxes.get(mid)) <= 0 && ((Comparable) pk).compareTo(mines.get(mid)) >= 0 ){
 					Page page = Deserialize.DeserializePage(pageNames.get(mid),tableName);
 					return binarySearchPage(tableName,page,pk);
@@ -507,6 +557,27 @@ public class DBApp {
 			Table deserializedTable = Deserialize.DeserializeTable(strTableName);
 			if(deserializedTable.getPageNames().isEmpty())
 				throw new DBAppException("Table is Empty");
+
+
+
+
+//
+//			boolean fag = true;
+//			for (Map.Entry<String, String> entry : htblColNameValue.entrySet()) {
+//				String key = entry.getKey();
+//				if (!key.equals()) {
+//				}else{
+//					fag = false;
+//				}
+//			}
+//			if(fag){
+//				throw new DBAppException("No ClusteringKeyInserted");
+//			}
+//
+
+
+
+
 			deserializedTable.deleteRows(htblColNameValue);
 			System.out.println("Deletion completed successfully.");
 		} else {
@@ -934,25 +1005,25 @@ public class DBApp {
 			String dou = "java.lang.double";
 //
 //			Hashtable htblColNameType = new Hashtable();
-//			htblColNameType.put("id", st);
+//			htblColNameType.put("ids", st);
 //			htblColNameType.put("name", st);
 //			htblColNameType.put("gpa", dou);
-//			dbApp.createTable( strTableName, "id", htblColNameType );
+//			dbApp.createTable( strTableName, "name", htblColNameType );
 //			dbApp.createIndex( strTableName, "id", "nameIndex" );
 
 
 //			Hashtable htblColNameValue = new Hashtable();
 //			htblColNameValue.put("id", "a1155");
-//			htblColNameValue.put("name", "Moksha");
+//			htblColNameValue.put("name", "Ibra");
 //			htblColNameValue.put("gpa",0.69);
 //			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-//			dbApp.updateTable("Student", "1", htblColNameValue);
+//			dbApp.updateTable("Student", "2", htblColNameValue);
 
 //			dbApp.deleteFromTable(strTableName, htblColNameValue);
-
-//			System.out.println(Deserialize.DeserializeTable(strTableName));
+//			System.out.println(columnNameReader(strTableName+"2"));
+			System.out.println(Deserialize.DeserializeTable("Student"));
 //			BTree tree = Deserialize.DeserializeTree("nameIndex", "Student");
 //			System.out.println(tree);
 			//		htblColNameValue.clear();

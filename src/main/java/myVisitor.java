@@ -117,9 +117,6 @@ public class myVisitor extends SQLBaseVisitor{
             }
             tbu.put(names.get(i), types.get(i));
         }
-        System.out.println(tableName);
-        System.out.println(primaryKey);
-        System.out.println(tbu);
 
         DBApp db = null;
         try {
@@ -137,9 +134,7 @@ public class myVisitor extends SQLBaseVisitor{
         return visitChildren(ctx);
     }
     public Object visitCloserindex(SQLParser.CloserindexContext ctx) {
-        System.out.println(tableName);
-        System.out.println(indexName);
-        System.out.println(names.getFirst());
+
 
 
         DBApp db = null;
@@ -160,8 +155,7 @@ public class myVisitor extends SQLBaseVisitor{
         return visitChildren(ctx);
     }
     public Object visitCloserinsert(SQLParser.CloserinsertContext ctx) {
-        System.out.println(tableName);
-        System.out.println(tbi);
+
 
         for(Hashtable<String, Object> ht : tbi){
             DBApp db = null;
@@ -180,12 +174,10 @@ public class myVisitor extends SQLBaseVisitor{
         return visitChildren(ctx);
     }
     public Object visitCloserupdate(SQLParser.CloserupdateContext ctx) {
-        System.out.println(tableName);
         Hashtable<String, Object> updated = new Hashtable<>();
         for(int i = 0; i < names.size(); i++){
             updated.put(names.get(i), updateValues.get(i));
         }
-        System.out.println(updated);
 
         DBApp db = null;
         try {
@@ -206,7 +198,7 @@ public class myVisitor extends SQLBaseVisitor{
         for(int i = 0; i < names.size(); i++){
             deleted.put(names.get(i), updateValues.get(i));
         }
-        System.out.println(deleted);
+
 
         DBApp db = null;
         try {

@@ -937,18 +937,18 @@ public class DBApp {
 
 //			Hashtable htblColNameValue = new Hashtable();
 //			htblColNameValue.put("id", "a1155");
-//			htblColNameValue.put("name", "joe");
-//			htblColNameValue.put("gpa", 3.3);
+//			htblColNameValue.put("name", "Moksha");
+//			htblColNameValue.put("gpa",0.69);
 //			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-//			dbApp.updateTable("Student", "a11", htblColNameValue);
+//			dbApp.updateTable("Student", "1", htblColNameValue);
 
 //			dbApp.deleteFromTable(strTableName, htblColNameValue);
 
-			System.out.println(Deserialize.DeserializeTable(strTableName));
-			BTree tree = Deserialize.DeserializeTree("nameIndex", "Student");
-			System.out.println(tree);
+//			System.out.println(Deserialize.DeserializeTable(strTableName));
+//			BTree tree = Deserialize.DeserializeTree("nameIndex", "Student");
+//			System.out.println(tree);
 			//		htblColNameValue.clear();
 			//		htblColNameValue.put("id", new Integer( 453455 ));
 			//		htblColNameValue.put("name", new String("Ahmed Noor" ) );

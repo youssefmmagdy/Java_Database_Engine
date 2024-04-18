@@ -535,6 +535,14 @@ public class Table implements Serializable,Iterator<Table> {
         break;
       }
     }
+    for(int i = 1;i<p.getTuples().size();i++){
+      Record re = p.getTuples().get(i);
+      if(!re.isNull){
+        p.setMin(re.getHm().get(primary));
+        setMinOfPages(n,p.getMin());
+        break;
+      }
+    }
   }
 
   public Vector<Integer> getRecord(Hashtable ht, String primary) throws IOException, ClassNotFoundException {

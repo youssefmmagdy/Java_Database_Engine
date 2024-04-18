@@ -582,7 +582,13 @@ public class Table implements Serializable,Iterator<Table> {
 
   public static void main(String[] args) throws IOException, ClassNotFoundException, DBAppException {
 
-    System.out.println(getIndexedColumns(columnNameReader("Student")));
+//    System.out.println(Deserialize.DeserializeTable("Student"));
+//    System.out.println(getIndexedColumns(columnNameReader("Student")));
+//Table t = Deserialize.DeserializeTable("Student");
+//t.getPageNames();
+//System.out.println(t);
+
+
 
   }
 

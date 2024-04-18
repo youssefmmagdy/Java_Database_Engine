@@ -246,7 +246,7 @@ public class DBApp {
 								Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
-			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".ser");
+			File f = new File("starter_code/" + strTableName + "/" + strTableName + ".class");
 			if (fileExists(f)) {
 				if (sizeCheck(htblColNameValue.size(), column.size())) {
 					if (tableDataTypeCheck(column, htblColNameValue)) {
@@ -260,7 +260,7 @@ public class DBApp {
 									try {
 										tab = DeserializeTable(strTableName);
 									} catch (IOException | ClassNotFoundException e) {
-										throw new DBAppException("Deseialized Table Not found");
+										throw new DBAppException("Deserialized Table Not found");
 									}
 									try {
 										tab.add(htblColNameValue);

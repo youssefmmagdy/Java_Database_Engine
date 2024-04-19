@@ -9,6 +9,7 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import java.io.*;
 import java.util.*;
 
+import static starter_code.Serialization.Deserialize.DeserializePage;
 import static starter_code.Serialization.Deserialize.DeserializeTable;
 
 
@@ -163,7 +164,7 @@ public class DBApp {
 
 
 							for (String pageName : deserializedTable.getPageNames()) {
-								Page deserializedPage = Deserialize.DeserializePage(pageName,strTableName);
+								Page deserializedPage = DeserializePage(pageName,strTableName);
 								Vector<Record> tuples = deserializedPage.getTuples();
 								for (Record r : tuples) {
 									for (Map.Entry<String, Object> entry : r.getHm().entrySet()) {
@@ -248,9 +249,11 @@ public class DBApp {
 					deserializedTree.print();
 					if (deserializedTree.getColumnName().equals(x)) {
 						Vector K = tab.getRecord(htblColNameValue,Key);
+//						if(K != null){
 						String place = strTableName + " " + strTableName + K.get(0);
 						deserializedTree.insert((Comparable) htblColNameValue.get(x),place);
 						deserializedTree.shiftRowsInTree();
+//						}
 					}
 					Serialize.Serializethis(deserializedTree.getTreeName(),deserializedTree, strTableName);
 				}
@@ -435,7 +438,7 @@ public class DBApp {
 				System.out.println(tree);
 				if(s == null)
 					throw new DBAppException("Record not found in Tree");
-				Page page = Deserialize.DeserializePage(Table.getPageName(s), strTableName);
+				Page page = DeserializePage(Table.getPageName(s), strTableName);
 				record = binarySearchPage(strTableName, page, strClusteringKeyValue);
 				if (record == null)
 					throw new DBAppException("Record Does Not Exist");
@@ -448,26 +451,33 @@ public class DBApp {
 					throw new DBAppException("Record Doesn't Exist");
 				}
 			}
-			Page i = Deserialize.DeserializePage(record.getPageName(), strTableName);
+			Page i = DeserializePage(record.getPageName(), strTableName);
 			int index = getRecordNumber(i, record);
 			if (index == -1)
 				throw new DBAppException("Record Not Found");
-			deleteFromTable(strTableName,record.getHm());
+			table.deleteRows(record.getHm(), false);
 			Record old = record;
 			for (Vector<String> d : column) {
 				if (record.getHm().containsKey(d.get(0)) && htblColNameValue.containsKey(d.get(0)))
 					record.getHm().put(d.get(0), htblColNameValue.get(d.get(0)));
 			}
-
+			System.out.println("here1");
 			try {
 				insertIntoTable(strTableName, record.getHm());
+				System.out.println("here2");
 			}catch(DBAppException e){
+				System.out.println("here3");
 				insertIntoTable(strTableName, old.getHm());
+				System.out.println("here4");
 			}
 
 //			i.getTuples().set(index, record);
 			table.update(i, getPrimaryKey(strTableName));
-			i = Deserialize.DeserializePage(record.getPageName(), strTableName);
+			System.out.println(table);
+			System.out.println(table.getminOfPages()+" mines");
+			System.out.println(table.getMaxOfPages()+" maxes");
+
+			i = DeserializePage(record.getPageName(), strTableName);
 			Serialize.Serializethis(i.getName(), i, strTableName);
 		}
 		else {
@@ -535,7 +545,7 @@ public class DBApp {
 				}
 
 				if(((Comparable) pk).compareTo(maxes.get(mid)) <= 0 && ((Comparable) pk).compareTo(mines.get(mid)) >= 0 ){
-					Page page = Deserialize.DeserializePage(pageNames.get(mid),tableName);
+					Page page = DeserializePage(pageNames.get(mid),tableName);
 					return binarySearchPage(tableName,page,pk);
 //					int i = 0, j = page.getNumberofRowsraw();
 //					while(i <= j){
@@ -570,24 +580,22 @@ public class DBApp {
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
-			if (comparecolumname(column, htblColNameValue)){
-                Table deserializedTable = null;
-                try {
-                    deserializedTable = Deserialize.DeserializeTable(strTableName);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new DBAppException("Could not deserialize Table");
-                }
-                if (deserializedTable.getPageNames().isEmpty())
-					throw new DBAppException("Table is Empty");
-                try {
-                    deserializedTable.deleteRows(htblColNameValue,false);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new DBAppException("Table Not Found");
-                }
-                System.out.println("Deletion completed successfully.");
-			}else {
+
+			Table deserializedTable = null;
+			try {
+				deserializedTable = Deserialize.DeserializeTable(strTableName);
+			} catch (IOException | ClassNotFoundException e) {
+				throw new DBAppException("Could not deserialize Table");
+			}
+			if (deserializedTable.getPageNames().isEmpty())
+				throw new DBAppException("Table is Empty");
+			try {
+				deserializedTable.deleteRows(htblColNameValue,true);
+			} catch (IOException | ClassNotFoundException e) {
 				throw new DBAppException("Table Not Found");
 			}
+			System.out.println("Deletion completed successfully.");
+
 		} else {
 			throw new DBAppException("Table Not Found");
 		}
@@ -676,7 +684,7 @@ public class DBApp {
 					}*/
 				if (strarrOperators.length == 0){
 					for (String pageName : v.getPageNames()) {
-						Page page = Deserialize.DeserializePage(pageName,v.getTableName());
+						Page page = DeserializePage(pageName,v.getTableName());
 						Vector<Record> tuples = page.getTuples();
 
 
@@ -822,7 +830,7 @@ public class DBApp {
 		for (int i = 0; i < arrSQLTerms.length-1; i++) {
 			for (int j = 0; j < strarrOperators.length; j++) {
 				for (String pageName : table.getPageNames()) {
-					Page page = Deserialize.DeserializePage(pageName, table.getTableName());
+					Page page = DeserializePage(pageName, table.getTableName());
 					Vector<Record> tuples = page.getTuples();
 					for (Record record : tuples) {
 						Hashtable<String, Object> ht = record.getHm();
@@ -968,7 +976,7 @@ public class DBApp {
 
 	public static boolean searchForClusteringKey(Table table, SQLTerm[] arrSQLTerms,int i) throws ClassNotFoundException, IOException {
 		for (String pageName : table.getPageNames()) {
-			Page page = Deserialize.DeserializePage(pageName,table.getTableName());
+			Page page = DeserializePage(pageName,table.getTableName());
 			Vector<Record> tuples = page.getTuples();
 
 
@@ -1021,20 +1029,24 @@ public class DBApp {
 
 
 			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("id", "a1155");
-//			htblColNameValue.put("name", "K1");
-//			htblColNameValue.put("gpa",0.69);
+			htblColNameValue.put("id", "a15");
+			htblColNameValue.put("name", "K0");
+			htblColNameValue.put("gpa",0.7);
 			//htblColNameValue.put("sss",0.69);
 //			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-//			dbApp.updateTable("Student", "M", htblColNameValue);
+			dbApp.updateTable("Student", "K10", htblColNameValue);
 
-			dbApp.deleteFromTable(strTableName, htblColNameValue);
+//			dbApp.deleteFromTable(strTableName, htblColNameValue);
 //			System.out.println(columnNameReader(strTableName+"2"));
 			System.out.println(Deserialize.DeserializeTable("Student"));
+			System.out.println(Deserialize.DeserializeTable("Student").getminOfPages()+" minimums");
+			System.out.println(Deserialize.DeserializeTable("Student").getMaxOfPages()+" maximums");
 			BTree tree = Deserialize.DeserializeTree("idIndex", "Student");
 			System.out.println(tree);
+			System.out.println(tree.getSize());
+
 			//		htblColNameValue.clear();
 			//		htblColNameValue.put("id", new Integer( 453455 ));
 			//		htblColNameValue.put("name", new String("Ahmed Noor" ) );

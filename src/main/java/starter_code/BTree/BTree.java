@@ -159,13 +159,15 @@ public class BTree<TKey extends Comparable<TKey>, TValue> implements Serializabl
             Vector<Object> tmp = new Vector<>();
             for(String pageName : table.getPageNames()){
                 Page page = Deserialize.DeserializePage(pageName,getTableName());
-                for(Record record : page.getTuples()){
-                    String s = (String) search((TKey) record.getHm().get(getColumnName()));
-                    if(s != null) {
-                        sb.append(record.getHm().get(getColumnName()) + " ");
-                        tmp.add(record.getHm().get(getColumnName()));
-                        tmpTree.delete((TKey) record.getHm().get(getColumnName()));
-                        tmpTree.insert((TKey) record.getHm().get(getColumnName()), getTableName() + " " + pageName);
+                for(Record record : page.getTuples()) {
+                    if (!record.isNull) {
+                        String s = (String) search((TKey) record.getHm().get(getColumnName()));
+                        if (s != null) {
+                            sb.append(record.getHm().get(getColumnName()) + " ");
+                            tmp.add(record.getHm().get(getColumnName()));
+                            tmpTree.delete((TKey) record.getHm().get(getColumnName()));
+                            tmpTree.insert((TKey) record.getHm().get(getColumnName()), getTableName() + " " + pageName);
+                        }
                     }
                 }
             }

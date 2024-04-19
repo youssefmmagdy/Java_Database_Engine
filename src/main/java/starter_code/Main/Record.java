@@ -9,7 +9,7 @@ public class Record implements Serializable,Comparable<Record> {
     Hashtable<String, Object> hm;
     String tableName;
     String pageName;
-    boolean isNull;
+    public boolean isNull;
 
     public Record (String pageName){
         this.pageName = pageName;

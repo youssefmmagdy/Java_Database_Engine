@@ -1,11 +1,13 @@
-import starter_code.Exception.DBAppException;
-import starter_code.Main.DBApp;
+package starter_code.Main;
 
+
+import starter_code.Exception.DBAppException;
+import starter_code.Main.starter_code.Main.*;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class myVisitor extends SQLBaseVisitor{
+public class myVisitor extends SQLBaseVisitor {
 
     Vector<String> names = new Vector<String>();
     Vector<String> types = new Vector<String>();
@@ -36,16 +38,16 @@ public class myVisitor extends SQLBaseVisitor{
     }
 
     public Object visitValue(SQLParser.ValueContext ctx) {
-            s=ctx.getText();
-            Object value = ctx.getText();
-            if (mayParse((String) value) != null) {
-                value = mayParse((String) value);
-            } else if (mayParse2((String) value) != null) {
-                value = mayParse2((String) value);
-            }else{
-                value = stringActuate(ctx.getText());
-            }
-            values.add(value);
+        s=ctx.getText();
+        Object value = ctx.getText();
+        if (mayParse((String) value) != null) {
+            value = mayParse((String) value);
+        } else if (mayParse2((String) value) != null) {
+            value = mayParse2((String) value);
+        }else{
+            value = stringActuate(ctx.getText());
+        }
+        values.add(value);
 
         return visitChildren(ctx);
     }
@@ -68,9 +70,9 @@ public class myVisitor extends SQLBaseVisitor{
         return visitChildren(ctx);
     }
     public Object visitType(SQLParser.TypeContext ctx) {
-            if(ctx.getText().equals("INT")) {types.add("java.lang.Integer");}
-            if(ctx.getText().equals("STRING")) {types.add("java.lang.String");}
-            if(ctx.getText().equals("DOUBLE")) {types.add("java.lang.Double");}
+        if(ctx.getText().equals("INT")) {types.add("java.lang.Integer");}
+        if(ctx.getText().equals("STRING")) {types.add("java.lang.String");}
+        if(ctx.getText().equals("DOUBLE")) {types.add("java.lang.Double");}
         return visitChildren(ctx);
     }
     public Object visitWrapper(SQLParser.WrapperContext ctx) {
@@ -80,22 +82,22 @@ public class myVisitor extends SQLBaseVisitor{
         Hashtable<String, Object> inserted = new Hashtable<>();
         Vector<Object> vec = new Vector<>();
         for(int i = 0; i < ctx.getChildCount(); i+=2){
-                Object value = ctx.getChild(i).getText();
-                if (mayParse((String) value) != null) {
-                    value = mayParse((String) value);
-                } else if (mayParse2((String) value) != null) {
-                    value = mayParse2((String) value);
-                }else{
-                    value = stringActuate(ctx.getChild(i).getText());
-                }
-                vec.add(value);
+            Object value = ctx.getChild(i).getText();
+            if (mayParse((String) value) != null) {
+                value = mayParse((String) value);
+            } else if (mayParse2((String) value) != null) {
+                value = mayParse2((String) value);
+            }else{
+                value = stringActuate(ctx.getChild(i).getText());
+            }
+            vec.add(value);
 
         }
         for(int i = 0; i < vec.size(); i++){
-                inserted.put(names.get(i), vec.get(i));
+            inserted.put(names.get(i), vec.get(i));
         }
         tbi.add(inserted);
-       return visitChildren(ctx);
+        return visitChildren(ctx);
     }
     public Object visitOper(SQLParser.OperContext ctx) {
         for (Object val : ctx.children) {

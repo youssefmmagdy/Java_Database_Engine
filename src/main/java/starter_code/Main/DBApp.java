@@ -1,14 +1,22 @@
 package starter_code.Main;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import starter_code.BTree.BTree;
 import starter_code.Exception.DBAppException;
+import starter_code.Main.starter_code.Main.SQLLexer;
+import starter_code.Main.starter_code.Main.SQLParser;
 import starter_code.Serialization.Deserialize;
 import starter_code.Serialization.Serialize;
 
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
+import static org.antlr.v4.runtime.CharStreams.fromFileName;
 import static starter_code.Serialization.Deserialize.DeserializePage;
 import static starter_code.Serialization.Deserialize.DeserializeTable;
 
@@ -1011,41 +1019,77 @@ public class DBApp {
 		}
 		return null;
 	}
+
+	// below method returns Iterator with result set if passed
+// strbufSQL is a select, otherwise returns null.
+	public Iterator parseSQL( StringBuffer strbufSQL ) throws DBAppException{
+		String s = strbufSQL.toString();
+		if(s.charAt(0) == 'C'){
+			String filePath = "src/main/java/test.txt";
+			try {
+				Files.writeString(Path.of(filePath), strbufSQL + System.lineSeparator());
+			} catch (IOException e) {e.printStackTrace();}
+
+			return null;
+		}
+		return null;
+	}
+
 	public static void main( String[] args ){
 
-		try{
-			DBApp dbApp = new DBApp();
-			String strTableName = "Student";
-			String st = "java.lang.String";
-			String in = "java.lang.Integer";
-			String dou = "java.lang.double";
+
+
+//		try{
+//			String source = "src/main/java/test.txt";
+//			CharStream cs = fromFileName(source);
+//			SQLLexer lexer = new SQLLexer(cs);
+//			CommonTokenStream token = new CommonTokenStream(lexer);
+//			SQLParser parser = new SQLParser(token);
+//			ParseTree tree = parser.parse();
 //
-			Hashtable htblColNameType = new Hashtable();
-			htblColNameType.put("id", st);
-			htblColNameType.put("name", st);
-			htblColNameType.put("gpa", dou);
+//			myVisitor visitor = new myVisitor();
+//			visitor.visit(tree);
+//
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
+
+		try{
+//			DBApp dbApp = new DBApp();
+//			String strTableName = "Student";
+//			String st = "java.lang.String";
+//			String in = "java.lang.Integer";
+//			String dou = "java.lang.double";
+//			StringBuffer sqlBuffer = new StringBuffer();
+//			sqlBuffer.append("CREATE INDEX \"gpaIndex\" ON \"Student\" (\"gpa\");");
+//			dbApp.parseSQL(sqlBuffer);
+
+//			Hashtable htblColNameType = new Hashtable();
+//			htblColNameType.put("id", st);
+//			htblColNameType.put("name", st);
+//			htblColNameType.put("gpa", dou);
 //			dbApp.createTable( strTableName, "name", htblColNameType );
 //			dbApp.createIndex( strTableName, "id", "idIndex" );
 
 
-			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("id", "a15");
-			htblColNameValue.put("name", "K0");
-			htblColNameValue.put("gpa",0.7);
+//			Hashtable htblColNameValue = new Hashtable();
+//			htblColNameValue.put("id", "a15");
+//			htblColNameValue.put("name", "K0");
+//			htblColNameValue.put("gpa",0.7);
 			//htblColNameValue.put("sss",0.69);
 //			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-			dbApp.updateTable("Student", "K10", htblColNameValue);
+//			dbApp.updateTable("Student", "K10", htblColNameValue);
 
 //			dbApp.deleteFromTable(strTableName, htblColNameValue);
 //			System.out.println(columnNameReader(strTableName+"2"));
-			System.out.println(Deserialize.DeserializeTable("Student"));
-			System.out.println(Deserialize.DeserializeTable("Student").getminOfPages()+" minimums");
-			System.out.println(Deserialize.DeserializeTable("Student").getMaxOfPages()+" maximums");
-			BTree tree = Deserialize.DeserializeTree("idIndex", "Student");
-			System.out.println(tree);
-			System.out.println(tree.getSize());
+//			System.out.println(Deserialize.DeserializeTable("Student"));
+//			System.out.println(Deserialize.DeserializeTable("Student").getminOfPages()+" minimums");
+//			System.out.println(Deserialize.DeserializeTable("Student").getMaxOfPages()+" maximums");
+//			BTree tree = Deserialize.DeserializeTree("idIndex", "Student");
+//			System.out.println(tree);
+//			System.out.println(tree.getSize());
 
 			//		htblColNameValue.clear();
 			//		htblColNameValue.put("id", new Integer( 453455 ));
@@ -1072,23 +1116,22 @@ public class DBApp {
 			//		dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-			//		SQLTerm[] arrSQLTerms;
-			//		arrSQLTerms = new SQLTerm[2];
-			//		arrSQLTerms[0]._strTableName =  "Student";
-			//		arrSQLTerms[0]._strColumnName=  "name";
-			//		arrSQLTerms[0]._strOperator  =  "=";
-			//		arrSQLTerms[0]._objValue     =  "John Noor";
+//					SQLTerm[] arrSQLTerms;
+//					arrSQLTerms = new SQLTerm[2];
+//					arrSQLTerms[0]._strTableName =  "Student";
+//					arrSQLTerms[0]._strColumnName=  "name";
+//					arrSQLTerms[0]._strOperator  =  "=";
+//					arrSQLTerms[0]._objValue     =  "Ahmed";
 
-			//		arrSQLTerms[1]._strTableName =  "Student";
-			//		arrSQLTerms[1]._strColumnName=  "gpa";
-			//		arrSQLTerms[1]._strOperator  =  "=";
-			//		arrSQLTerms[1]._objValue     =  1.5 ;
-			//		arrSQLTerms[1]._objValue     =  new Double( 1.5 );
+//					arrSQLTerms[1]._strTableName =  "Student";
+//					arrSQLTerms[1]._strColumnName=  "gpa";
+//					arrSQLTerms[1]._strOperator  =  "=";
+//					arrSQLTerms[1]._objValue     =  0.8 ;
 
-			//		String[] strarrOperators = new String[1];
-			//		strarrOperators[0] = "OR";
+//					String[] strarrOperators = new String[1];
+//					strarrOperators[0] = "OR";
 			// select * from Student where name = "John Noor" or gpa = 1.5;
-			//		Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
+//					Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 
 			// Perform deletion
 			//		dbApp.deleteFromTable(strTableName, htblColNameValue);

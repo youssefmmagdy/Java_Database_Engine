@@ -25,6 +25,61 @@
           <option name="generateListener" value="false" />
           <option name="generateVisitor" value="true" />
         </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/java/starter_code/SQL.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="C:\Users\ahmos\IdeaProjects\Java_Database_Engine\src\main\java\starter_code" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateListener" value="false" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/java/starter_code/sql.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="C:\Users\ahmos\IdeaProjects\Java_Database_Engine\src\main\java\starter_code" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateListener" value="false" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/java/starter_code/Main/antlr/sql.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="C:\Users\ahmos\IdeaProjects\Java_Database_Engine\src\main\java\starter_code\Main\antlr" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateListener" value="false" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/java/starter_code/Main/antlr/SQL.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="C:\Users\ahmos\IdeaProjects\Java_Database_Engine\src\main\java\starter_code\Main\antlr\starter_code\Main\antlr" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateListener" value="false" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
+        <PerGrammarGenerationSettings>
+          <option name="fileName" value="$PROJECT_DIR$/src/main/java/starter_code/Main/SQL.g4" />
+          <option name="autoGen" value="true" />
+          <option name="outputDir" value="C:\Users\ahmos\IdeaProjects\Java_Database_Engine\src\main\java\starter_code\Main" />
+          <option name="libDir" value="" />
+          <option name="encoding" value="" />
+          <option name="pkg" value="" />
+          <option name="language" value="" />
+          <option name="generateListener" value="false" />
+          <option name="generateVisitor" value="true" />
+        </PerGrammarGenerationSettings>
       </list>
     </option>
   </component>

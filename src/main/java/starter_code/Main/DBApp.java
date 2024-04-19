@@ -262,7 +262,7 @@ public class DBApp {
 	public boolean comparecolumname(Vector column,Hashtable<String, Object> htblColNameValue){
 		for (int i = 0; i < column.size(); i++) {
 			Vector c= (Vector) column.get(i);
-			if (!c.get(0).equals(htblColNameValue.containsKey(c.get(0)))){
+			if (!htblColNameValue.containsKey(c.get(0))){
 				return false;
 			}
 		}
@@ -1018,9 +1018,10 @@ public class DBApp {
 
 
 			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("ID", "a1155");
+			htblColNameValue.put("ids", "a1155");
 			htblColNameValue.put("name", "Ibra");
 			htblColNameValue.put("gpa",0.69);
+			//htblColNameValue.put("sss",0.69);
 			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 

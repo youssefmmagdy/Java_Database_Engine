@@ -191,7 +191,6 @@ public class DBApp {
 					fileWriter.write(sb.toString());
 				}
 				fileWriter.close();
-
 			}catch (IOException e) {
 				throw new RuntimeException(e);
 			} catch (ClassNotFoundException e) {
@@ -445,8 +444,6 @@ public class DBApp {
 			}
 			else {
 				record = binarySearch(strTableName, strClusteringKeyValue);
-				System.out.println(Deserialize.DeserializeTable(strTableName));
-				System.out.println(1);
 				if (record == null) {
 					throw new DBAppException("Record Doesn't Exist");
 				}
@@ -456,11 +453,17 @@ public class DBApp {
 			if (index == -1)
 				throw new DBAppException("Record Not Found");
 			deleteFromTable(strTableName,record.getHm());
+			Record old = record;
 			for (Vector<String> d : column) {
 				if (record.getHm().containsKey(d.get(0)) && htblColNameValue.containsKey(d.get(0)))
 					record.getHm().put(d.get(0), htblColNameValue.get(d.get(0)));
 			}
-			insertIntoTable(strTableName,record.getHm());
+
+			try {
+				insertIntoTable(strTableName, record.getHm());
+			}catch(DBAppException e){
+				insertIntoTable(strTableName, old.getHm());
+			}
 
 //			i.getTuples().set(index, record);
 			table.update(i, getPrimaryKey(strTableName));
@@ -577,7 +580,7 @@ public class DBApp {
                 if (deserializedTable.getPageNames().isEmpty())
 					throw new DBAppException("Table is Empty");
                 try {
-                    deserializedTable.deleteRows(htblColNameValue);
+                    deserializedTable.deleteRows(htblColNameValue,false);
                 } catch (IOException | ClassNotFoundException e) {
                     throw new DBAppException("Table Not Found");
                 }
@@ -1009,29 +1012,29 @@ public class DBApp {
 			String in = "java.lang.Integer";
 			String dou = "java.lang.double";
 //
-//			Hashtable htblColNameType = new Hashtable();
-//			htblColNameType.put("ids", st);
-//			htblColNameType.put("name", st);
-//			htblColNameType.put("gpa", dou);
+			Hashtable htblColNameType = new Hashtable();
+			htblColNameType.put("id", st);
+			htblColNameType.put("name", st);
+			htblColNameType.put("gpa", dou);
 //			dbApp.createTable( strTableName, "name", htblColNameType );
-//			dbApp.createIndex( strTableName, "id", "nameIndex" );
+//			dbApp.createIndex( strTableName, "id", "idIndex" );
 
 
 			Hashtable htblColNameValue = new Hashtable();
-			htblColNameValue.put("ids", "a1155");
-			htblColNameValue.put("name", "Ibra");
-			htblColNameValue.put("gpa",0.69);
+			htblColNameValue.put("id", "a1155");
+//			htblColNameValue.put("name", "K1");
+//			htblColNameValue.put("gpa",0.69);
 			//htblColNameValue.put("sss",0.69);
-			dbApp.insertIntoTable( strTableName , htblColNameValue );
+//			dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-//			dbApp.updateTable("Student", "2", htblColNameValue);
+//			dbApp.updateTable("Student", "M", htblColNameValue);
 
-//			dbApp.deleteFromTable(strTableName, htblColNameValue);
+			dbApp.deleteFromTable(strTableName, htblColNameValue);
 //			System.out.println(columnNameReader(strTableName+"2"));
 			System.out.println(Deserialize.DeserializeTable("Student"));
-//			BTree tree = Deserialize.DeserializeTree("nameIndex", "Student");
-//			System.out.println(tree);
+			BTree tree = Deserialize.DeserializeTree("idIndex", "Student");
+			System.out.println(tree);
 			//		htblColNameValue.clear();
 			//		htblColNameValue.put("id", new Integer( 453455 ));
 			//		htblColNameValue.put("name", new String("Ahmed Noor" ) );

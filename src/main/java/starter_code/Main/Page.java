@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
+
 public class Page implements Serializable{
 
     private String tableName;
@@ -64,7 +65,20 @@ public class Page implements Serializable{
     }
 
     public void setMax(Object max) {
-        this.max = max;
+        if(this.max == null)
+            this.max = max;
+        if(max instanceof Integer){
+            Integer x = (Integer)max;
+            this.max = Math.max(x,(Integer) this.max);
+        }
+        if(max instanceof Double){
+            Double x = (Double) max;
+            this.max = Math.max(x,(Double) this.max);
+        }
+        if(max instanceof String){
+            String x = (String)max;
+            this.max = x.compareTo((String) this.max) > 0 ? x : this.max;
+        }
     }
 
     public Object getMin() {
@@ -72,7 +86,22 @@ public class Page implements Serializable{
     }
 
     public void setMin(Object min) {
-        this.min = min;
+        if(this.min == null)
+            this.min = min;
+        if(min instanceof Integer){
+            Integer x = (Integer)min;
+            this.min = Math.min(x,(Integer) this.min);
+        }
+        if(min instanceof Double){
+            Double x = (Double) min;
+            this.min = Math.min(x,(Double) this.min);
+        }
+        if(min instanceof String){
+            String x = (String)min;
+            this.min = x.compareTo((String) this.min) < 0 ? x : this.min;
+        }
+
+
     }
 
     public int getNumberOfRows(){

@@ -367,7 +367,7 @@ public class Table implements Serializable,Iterator<Table> {
     return null;
   }
 
-  public void deleteRows(Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException {
+  public void deleteRows(Hashtable<String, Object> htblColNameValue, boolean flag10) throws IOException, ClassNotFoundException, DBAppException {
 
     if(htblColNameValue.size() == 0){
       while(pageNames.size() > 0){
@@ -384,25 +384,34 @@ public class Table implements Serializable,Iterator<Table> {
     }
 
     Vector<String> indexedColumns =  getIndexedColumns(columnNameReader(tableName));
-    boolean f = false;
+    boolean f = false , f2 = false , f3 = false;
     for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
+      if(f2)
+        break;
       if (indexedColumns.contains(entry.getKey())) {
+        System.out.println("inside index");
+        f2 = true;
         f = true;
         BTree tree = Deserialize.DeserializeTree(getTreeName(columnNameReader(tableName), entry.getKey()), tableName);
         String s = (String) tree.search((Comparable) entry.getValue());
         if(s == null)
           throw new DBAppException("Record Not Found");
         Page page = Deserialize.DeserializePage(getPageName(s), tableName);
+        System.out.println(page.getTuples()+"page");
+        int i = 0;
         for (Record record : page.getTuples()) {
+          System.out.println(record+"rec");
           boolean flag = false;
           for (Map.Entry<String, Object> entry1 : htblColNameValue.entrySet()) {
             if (!record.getHm().containsKey(entry1.getKey())
                     || !record.getHm().get(entry1.getKey()).equals(htblColNameValue.get(entry1.getKey()))) {
               flag = true;
+              System.out.println("flag is true");
               break;
             }
           }
           if (!flag) {
+            f3 = true;
             for (Map.Entry<String, Object> entry1 : htblColNameValue.entrySet()) {
               if(indexedColumns.contains(entry1.getKey())){
                 tree = Deserialize.DeserializeTree(getTreeName(columnNameReader(tableName), entry1.getKey()), tableName);
@@ -410,7 +419,12 @@ public class Table implements Serializable,Iterator<Table> {
                 Serialize.Serializethis(tree.getTreeName(), tree, tableName);
               }
             }
-            record.setNull();
+            if(flag10)
+              record.setNull();
+            else {
+              page.getTuples().remove(record);
+            }
+            System.out.println(page+" after removing record");
             update(page, getPrimaryKey(tableName));
             numberOfRows--;
 
@@ -426,9 +440,14 @@ public class Table implements Serializable,Iterator<Table> {
               Serialize.Serializethis(record.getPageName(), page, tableName);
             }
             Serialize.Serializethis(tableName, this, tableName);
+            System.out.println("hy");
           }
-        }
-
+          i++;
+          if(i > page.getTuples().size())
+            break;
+        }if(!f3)
+          throw new DBAppException("Record Not Found");
+        System.out.println("hy3");
 
       }
     }
@@ -448,8 +467,10 @@ public class Table implements Serializable,Iterator<Table> {
         if (record == null)
           throw new DBAppException("Record Doesn't Exist");
 
-        record.setNull();
         Page i = Deserialize.DeserializePage(record.getPageName(), tableName);
+        if(flag10)
+          record.setNull();
+        else i.getTuples().remove(record);
         i.getTuples().get(getRecordNumber(i, record)).setNull();
         update(i, getPrimaryKey(tableName));
 
@@ -486,7 +507,9 @@ public class Table implements Serializable,Iterator<Table> {
             }
 
             if (match) {
-              tuple.setNull();
+              if(flag10)
+                tuple.setNull();
+              else iterator.remove();
               update(deserializedPage, getPrimaryKey(tableName));
 //            iterator.remove();
 
@@ -532,6 +555,14 @@ public class Table implements Serializable,Iterator<Table> {
       if(!re.isNull){
         p.setMax(re.getHm().get(primary));
         setMaxOfPages(n,p.getMax());
+        break;
+      }
+    }
+    for(int i = 1;i<p.getTuples().size();i++){
+      Record re = p.getTuples().get(i);
+      if(!re.isNull){
+        p.setMin(re.getHm().get(primary));
+        setMinOfPages(n,p.getMin());
         break;
       }
     }

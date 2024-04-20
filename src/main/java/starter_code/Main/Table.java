@@ -204,7 +204,7 @@ public class Table implements Serializable,Iterator<Table> {
         }
 
 
-
+        update(p, primary);
         if (in) {
           if (p.getNumberofRowsraw() < maxRowsCount) {
             insertmiddle(ht, p, primary);
@@ -241,7 +241,9 @@ public class Table implements Serializable,Iterator<Table> {
             }
           }
         }
+        update(p, primary);
       }
+
     }
     else{
       classicInsert(ht,primary);

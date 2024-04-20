@@ -1,1 +1,0 @@
-DELETE FROM "Student" WHERE "id" = 2;

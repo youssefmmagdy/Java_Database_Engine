@@ -5,6 +5,7 @@ import starter_code.Exception.DBAppException;
 import starter_code.Main.starter_code.Main.*;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class myVisitor extends SQLBaseVisitor {
@@ -222,23 +223,37 @@ public class myVisitor extends SQLBaseVisitor {
         System.out.println(values);
         System.out.println(operators);
         System.out.println(between);
-//selectFromTable(SQLTerm[] arrSQLTerms, between)
+        try {
+        SQLTerm[] arrSQLTerms = new SQLTerm[names.size()];
+        String[] strarrOperators = new String[between.size()];
+        for(int i=0; i<arrSQLTerms.length; i++){
+            SQLTerm sql = new SQLTerm();
+            arrSQLTerms[i] = sql;
+            arrSQLTerms[i]._strTableName =  tableName;
+            arrSQLTerms[i]._strColumnName=  names.get(i);
+            arrSQLTerms[i]._strOperator  =  operators.get(i);
+            arrSQLTerms[i]._objValue     =  values.get(i);}
 
-//        DBApp db = null;
-//        try {
-//            db = new DBApp();
-//            db.selectFromTable(SQLTerm[] arrSQLTerms, between);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        } catch (ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//        } catch (DBAppException e) {
-//            throw new RuntimeException(e);
-//        }
+        for(int i = 0; i<strarrOperators.length; i++){
+            strarrOperators[i] = between.get(i);
+        }
+            DBApp db = new DBApp();
+            Iterator resultSet = db.selectFromTable(arrSQLTerms , strarrOperators);
+			System.out.println(resultSet.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (DBAppException e) {
+            throw new RuntimeException(e);
+        }
         return visitChildren(ctx);
     }
     public static String stringActuate(String str) {
-        return  str.substring(1, str.length() - 1);
+        if(str.charAt(0) == '"' && str.charAt(str.length()-1) == '"'){
+            return  str.substring(1, str.length() - 1);
+        }
+        return str;
     }
     public static Integer mayParse(String str) {
         try {

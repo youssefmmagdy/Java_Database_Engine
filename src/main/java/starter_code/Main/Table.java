@@ -12,6 +12,7 @@ import static starter_code.Serialization.Deserialize.DeserializeTable;
 
 public class Table implements Serializable,Iterator<Table> {
   private String tableName;
+  private String primaryKey;
 
   public void setPageNames(Vector<String> pageNames) {
     this.pageNames = pageNames;
@@ -646,23 +647,18 @@ public class Table implements Serializable,Iterator<Table> {
     return null;
   }
 
-  public Record getRecordValue(Object Id) throws IOException, ClassNotFoundException {
-    Record Returned = null;
+  public Record getRecordValue(Hashtable<String, Object> Id) throws IOException, ClassNotFoundException {
     for(String pagename : pageNames) {
       Page K = Deserialize.DeserializePage(pagename,tableName);
-      for (int j = 0; j < K.getNumberOfRows();j++){
         Vector<Record> M = K.getTuples();
         for (int k = 0; k < M.size(); k++){
-          Record ComparedTo = M.get(k);
-          System.out.println(ComparedTo + " "+Id);
-          if (ComparedTo.hm.contains(Id)){
-            Returned = M.get(k);
-          }
+            Hashtable ht = M.get(k).getHm();
+            if(ht.equals(Id)){
+              return M.get(k);
+            }
         }
-      }
-
     }
-    return Returned;
+    return null;
   }
 
   public static void main(String[] args) throws IOException, ClassNotFoundException, DBAppException {

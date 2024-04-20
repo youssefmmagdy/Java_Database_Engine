@@ -1244,7 +1244,7 @@ public class DBApp {
 //			String st = "java.lang.String";
 //			String in = "java.lang.Integer";
 //			String dou = "java.lang.double";
-//			StringBuffer sqlBuffer = new StringBuffer();
+			StringBuffer sqlBuffer = new StringBuffer();
 //			sqlBuffer.append("CREATE TABLE \"Student\" (\"id\" INT PRIMARY KEY, \"name\" STRING, \"gpa\" DOUBLE);");
 //			dbApp.parseSQL(sqlBuffer);
 //			sqlBuffer.delete(0,sqlBuffer.length());

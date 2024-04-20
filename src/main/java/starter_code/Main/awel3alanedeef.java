@@ -387,27 +387,85 @@ public class awel3alanedeef {
         return newobj;
     }
 
-    public Vector<String> Solver (Vector<String>[] operands, String[] op) throws DBAppException {
+
+
+    public static Vector<Record> Solver (Vector<Record>[] operands, String[] op) throws DBAppException {
 
     if((operands.length-op.length)!=1){
         throw new DBAppException("Difference should be 1");
     }
     for (int i = 0; i < op.length; i++) {
-
+        Vector<Record> LastmanStanding = new Vector<>();
         if(op[i].equals("AND")){
-            Vector<String> bf = operands[i];
-            Vector<String> af = operands[i+1];
+
+            Vector<Record> bf = operands[i];
+            Vector<Record> af = operands[i+1];
             int length = Math.min(af.size(), bf.size());
+
             for(int j = 0; j < length; j++){
                 for(int k =0; k < af.size(); k++){
+                    if(operands[i].get(j)==operands[i+1].get(k)){
 
+                        LastmanStanding.add(operands[i].get(j));
+                    }
                 }
             }
+                operands[i] = LastmanStanding;
+            op = (String[]) removeFromArray(op,i);
+            operands = (Vector<Record>[]) removeFromArray(operands,i+1);
         }
 
     }
+        for (int i = 0; i < op.length; i++) {
+            Vector<Record> LastmanStanding = new Vector<>();
+            if(op[i].equals("OR")){
+
+                Vector<Record> bf = operands[i];
+                Vector<Record> af = operands[i+1];
+                int length = Math.min(af.size(), bf.size());
+                bf.addAll(af);
+                LinkedHashSet<Record> hashSet = new LinkedHashSet<Record>(bf);
+                bf.clear();
+                bf.addAll(hashSet);
+
+
+
+
+                op = (String[]) removeFromArray(op,i);
+                operands = (Vector<Record>[]) removeFromArray(operands,i+1);
+            }
+
+        }
+        for (int i = 0; i < op.length; i++) {
+            Vector<Record> LastmanStanding = new Vector<>();
+            if(op[i].equals("XOR")){
+
+                Vector<Record> bf = operands[i];
+                Vector<Record> af = operands[i+1];
+                int length = Math.min(af.size(), bf.size());
+
+                for(int j = 0; j < length; j++){
+                    for(int k =0; k < af.size(); k++){
+                        if(operands[i].get(j)==operands[i+1].get(k)){
+                            LastmanStanding.add(operands[i].get(j));
+                        }
+                    }
+                }
+                      Vector<Record> r =  operands[i];
+                      r.removeAll(LastmanStanding);
+                      operands[i] = r;
+                      op = (String[]) removeFromArray(op,i);
+                      operands = (Vector<Record>[]) removeFromArray(operands,i+1);
+            }
+
+        }
         return null;
     }
-
+public static void main(String[] args) throws IOException, ClassNotFoundException {
+        DBApp db = new DBApp();
+        db.init();
+        Vector<Record>[] arr = new Vector[4];
+        String[] op = new String[]{"AND","XOR","OR"};
+}
 
 }

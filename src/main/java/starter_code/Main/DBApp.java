@@ -18,8 +18,10 @@ import java.util.*;
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 import static org.antlr.v4.runtime.CharStreams.fromString;
-import static starter_code.Serialization.Deserialize.DeserializePage;
-import static starter_code.Serialization.Deserialize.DeserializeTable;
+import static starter_code.Main.Table.*;
+import static starter_code.Main.Table.getPageName;
+import static starter_code.Serialization.Deserialize.*;
+import static starter_code.Serialization.Deserialize.DeserializeTree;
 
 
 /** * @author Wael Abouelsaadat */
@@ -706,590 +708,555 @@ public class DBApp {
 	 @param strarrOperators : Operators between conditions.
 	 @return : The Query to be returned.
 	 **/
-	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
-									String[]  strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
+	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[]  strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
 		if(arrSQLTerms.length > 0) {
 			Table deserializedTable = DeserializeTable(arrSQLTerms[0]._strTableName);
 			if (deserializedTable.getPageNames().isEmpty())
 				throw new DBAppException("Table is Empty");
-		}else{
-			throw new DBAppException("Select is Empty");
 		}
 		boolean flag = false;
-		//Stack<SQLTerm[]> s = new Stack<>();
+		Table v = new Table("Student");
 		// useless line but ill keep it for reference -> Iterator operators = Arrays.stream(strarrOperators).iterator();
 		// idk what to do with this--> bplustree tree = new bplustree(deserializedTable.getNumberOfRows());
 		//		By Doing this  -->  BTree tree = new BTree(tableName, columnName, indexName);
+		Vector<Record>[] vectors = new Vector[arrSQLTerms.length];
 		Iterator table = new Table3ashankhaterSeif();
-		for (Table v: tables) {
-			if (v.getTableName().equals(arrSQLTerms[0]._strTableName) && searchMetadata(arrSQLTerms[0]._strTableName)) {
-				flag = true;
-				table = new Table3ashankhaterSeif();
-				if (strarrOperators.length == 0){
-					for (String pageName : v.getPageNames()) {
-						Page page = DeserializePage(pageName,v.getTableName());
-						Vector<Record> tuples = page.getTuples();
+		if (v.getTableName().equals(arrSQLTerms[0]._strTableName) && searchMetadata(arrSQLTerms[0]._strTableName)) {
+			flag = true;
+			table = new Table3ashankhaterSeif();
 
+			if (strarrOperators.length == 0) {
+				for (String pageName : v.getPageNames()) {
+					Page page = DeserializePage(pageName, v.getTableName());
+					Vector<Record> tuples = page.getTuples();
 
-						for (Record record : tuples) {
-							Hashtable<String, Object> ht = record.getHm();
-							for (Map.Entry<String, Object> entry : ht.entrySet()) {
-								String key = entry.getKey();
-								Object value = entry.getValue();
+					for (Record record : tuples) {
+						Hashtable<String, Object> ht = record.getHm();
+						for (Map.Entry<String, Object> entry : ht.entrySet()) {
+							String key = entry.getKey();
+							Object value = entry.getValue();
 
-								if (key.equalsIgnoreCase(arrSQLTerms[0]._strColumnName)) {
-									if (checkValidity(value, arrSQLTerms, 0)) {
-										switch (arrSQLTerms[0]._strOperator) {
-											case "=":
-												if (value.equals(arrSQLTerms[0]._objValue)) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											case ">":
-												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) > 0) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											case ">=":
-												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) >= 0) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											case "<":
-												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) < 0) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											case "<=":
-												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											case "!=":
-												if (!value.equals(arrSQLTerms[0]._objValue)) {
-													((Table3ashankhaterSeif) table).addRecord(record);
-												}
-												break;
-											default:
-												throw new DBAppException("Error: Invalid operator.");
-										}
+							if (key.equalsIgnoreCase(arrSQLTerms[0]._strColumnName)) {
+								if (checkValidity2(value, arrSQLTerms, 0)) {
+									switch (arrSQLTerms[0]._strOperator) {
+										case "=":
+											if (value.equals(arrSQLTerms[0]._objValue)) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										case ">":
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) > 0) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										case ">=":
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) >= 0) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										case "<":
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) < 0) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										case "<=":
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										case "!=":
+											if (!value.equals(arrSQLTerms[0]._objValue)) {
+												Vector<Record> vec = new Vector<>();
+												Record r = v.getRecordValue(ht);
+												vec.add(r);
+												vectors[0] = vec;
+											}
+											break;
+										default:
+											throw new DBAppException("Error: Invalid operator.");
 									}
 								}
 							}
 						}
 					}
 				}
-				else{
-					ExecuteQuery(arrSQLTerms,(Table3ashankhaterSeif) table,strarrOperators,v);
+			} else
+			{
+				Vector<String> indexedColumns = getIndexedColumns(columnNameReader(v.getTableName()));
+
+
+				// checks on Primary Keys & Indexed
+
+				for(int i = 0;i < arrSQLTerms.length;i++) {
+
+					Vector<Record> records = new Vector<>();
+
+					if(vectors[i] == null && arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)){
+
+						String treeName = getTreeName(columnNameReader(v.getTableName()), arrSQLTerms[i]._strColumnName);
+						BTree tree = DeserializeTree(treeName, v.getTableName());
+
+						switch (arrSQLTerms[i]._strOperator){
+							case "=":
+								String s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
+								Page page = DeserializePage(getPageName(s) , v.getTableName());
+								Record record = binarySearchPage(v.getTableName(),page,arrSQLTerms[i]._objValue);
+								records.add(record);
+								;break;
+							case "<=": ;break;
+							case ">=": ;break;
+							case "<": ;break;
+							case ">": ;break;
+						}
+
+						String s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
+						Page page = DeserializePage(getPageName(s) , v.getTableName());
+						Record record = binarySearchPage(v.getTableName(),page,arrSQLTerms[i]._objValue);
+						records.add(record);
+
+						vectors[i] = records;
+						break;
+					}
+
+
 				}
+
+				// checks on Primary Keys (Not Indexed)
+				for(int i = 0;i < arrSQLTerms.length;i++) {
+					Vector<Record> records = new Vector<>();
+					if(vectors[i] == null && arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && ! indexedColumns.contains(arrSQLTerms[i]._strColumnName)){
+
+						Vector<Record> records1 = new Vector<>();
+						switch (arrSQLTerms[i]._strOperator){
+							case "=":
+								Record record = binarySearch(v.getTableName(),arrSQLTerms[i]._objValue);
+								records.add(record);
+								;break;
+							case "<=":
+								records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],2);
+								while(!records1.isEmpty()){
+									records.add(records1.remove(0));
+								}
+								break;
+							case ">=":
+								records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],3);
+								while(!records1.isEmpty()){
+									records.add(records1.remove(0));
+								}
+								break;
+							case "<":
+								records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],4);
+								while(!records1.isEmpty()){
+									records.add(records1.remove(0));
+								}
+								break;
+							case ">":
+								records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],5);
+								while(!records1.isEmpty()){
+									records.add(records1.remove(0));
+								}
+								;
+								break;
+						}
+						vectors[i] = records;
+						break;
+					}
+
+				}
+
+
+				// checks on Indexed Only
+				for (int i = 0; i < arrSQLTerms.length; i++) {
+					Vector<Record> records = new Vector<>();
+					if (vectors[i] == null && !arrSQLTerms[i].equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)) {
+						String treeName = getTreeName(columnNameReader(v.getTableName()), arrSQLTerms[i]._strColumnName);
+						BTree tree = DeserializeTree(treeName, v.getTableName());
+
+						String s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
+						BTree tmp = new BTree<>(v.getTableName(), tree.getColumnName(), tree.getTreeName());
+						while (s != null) {
+							int x = 0;
+							switch (arrSQLTerms[i]._strOperator) {
+								case "=":
+									x = 1;
+									break;
+								case "<=":
+									x = 2;
+									break;
+								case ">=":
+									x = 3;
+									break;
+								case "<":
+									x = 4;
+									break;
+								case ">":
+									x = 5;
+									break;
+							}
+							Page page = DeserializePage(getPageName(s), v.getTableName());
+							Vector<Record> records1 = linearSearch(page, arrSQLTerms[i], x);
+							while (records1.size() > 0) {
+								records.add(records1.remove(0));
+							}
+
+							tmp.insert((Comparable) arrSQLTerms[i]._objValue, s);
+							s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
+						}
+
+						while (tmp.getSize() > 0) {
+							tree.insert(strarrOperators[i], tmp.search(strarrOperators[i]));
+							tmp.delete(strarrOperators[i]);
+						}
+
+					}
+
+				}
+
+
+				for(int i = 0;i < arrSQLTerms.length;i++) {
+					if(vectors[i] == null)
+						vectors[i] = linearSearchTable2(DeserializeTable(v.getTableName()), arrSQLTerms[i]);
+
+				}
+				Vector<Record> records = Solver(vectors, strarrOperators);
+				for(int i=0;i<records.size();i++){
+					((Table3ashankhaterSeif) table).addRecord(records.get(i));
+				}
+				return table;
+
+
 			}
 		}
 		if (flag){
+			table = (Iterator) Solver(vectors,strarrOperators);
+			System.out.println("done");
 			return table;
+
 		}
 		else{
 			throw new DBAppException("Table not found.");
 		}
 	}
+	public static Vector<Record> linearSearch(Page page, SQLTerm term, int x){
+		Vector<Record> records = new Vector<>();
+		for(Record record : page.getTuples()){
+			Object obj = record.getHm().get(term._strColumnName);
+			switch (x){
+				case 1:
+					if(((Comparable)obj).compareTo(term._objValue) == 0){
+						records.add(record);
+					}
+					;break;
+				case 2:
+					if(((Comparable)obj).compareTo(term._objValue) <= 0){
+						records.add(record);
+					}
+					;break;
+				case 3:
+					if(((Comparable)obj).compareTo(term._objValue) >= 0){
+						records.add(record);
+					}
+					;break;
+				case 4:
+					if(((Comparable)obj).compareTo(term._objValue) < 0){
+						records.add(record);
+					}
+					;break;
+				case 5:
+					if(((Comparable)obj).compareTo(term._objValue) > 0){
+						records.add(record);
+					}
+					;break;
+			}
+		}
+		return records;
+	}
 
+	public boolean checkValidity2(Object value, SQLTerm[] arrSQLTerms, int i){
+		if (value instanceof Integer || value instanceof Double){
+			if (arrSQLTerms[i]._objValue instanceof Integer || arrSQLTerms[i]._objValue instanceof Double){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else{
+			if (arrSQLTerms[i]._objValue instanceof Integer || arrSQLTerms[i]._objValue instanceof Double){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+	}
+
+	public static Vector<Record>[] removeFromArray(Vector<Record>[] array, int tbr){
+		Vector<Record>[] newobj = new Vector[array.length];
+		for(int i = 0; i < array.length; i++){
+			if(i!=tbr){
+				newobj[i] = array[i];
+			}
+		}
+//        Vector<Record>[] newnewobj = new Vector[array.length-1];
+//        for(int i = 0; i < array.length-1; i++){
+//            if(!(newobj[i]==null)){
+//                newnewobj[i] = newobj[i];
+//            }
+//        }
+		return newobj;
+	}
+	public static String[] removeFromArray2(String[] array, int tbr){
+		String[] newobj = new String[array.length];
+		for(int i = 0; i < array.length; i++){
+			if(i!=tbr){
+				newobj[i] = array[i];
+			}
+		}
+//     String[] newnewobj = new String[array.length-1];
+//        for(int i = 0; i < array.length-1; i++){
+//            if(!(newobj[i]==null)){
+//                newnewobj[i] = newobj[i];
+//            }
+//        }
+		return newobj;
+	}
+
+
+
+	public static Vector<Record> Solver (Vector<Record>[] operands, String[] op) throws DBAppException {
+
+		if((operands.length-op.length)!=1){
+			throw new DBAppException("Difference should be 1");
+		}
+		Vector<Vector<Record>> vecquick = new Vector<>();
+		for(int i =0; i<operands.length;i++){
+			vecquick.add(operands[i]);
+		}
+		for (int i = 0; i < op.length; i++) {
+			Vector<Record> LastmanStanding = new Vector<>();
+			if(!(op[i]==null)&&op[i].equals("AND")){
+
+				Vector<Record> bf = vecquick.get(i);
+				Vector<Record> af = vecquick.get(i+1);
+				int length = Math.min(af.size(), bf.size());
+
+				for(int j = 0; j < length; j++){
+
+
+					if(bf.size()==length){
+						for(int k =0; k < af.size(); k++){
+							if ((vecquick.get(i).get(j).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))
+									.equals(vecquick.get(i+1).get(k).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))) {
+								LastmanStanding.add(vecquick.get(i).get(j));
+							}
+						}
+					}else {
+						for (int k = 0; k < bf.size(); k++) {
+							if ((operands[i + 1].get(j).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))
+									.equals(vecquick.get(i).get(k).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))) {
+
+								LastmanStanding.add(vecquick.get(i+1).get(j));
+							}
+						}
+					}
+				}
+				operands[i] = LastmanStanding;
+
+				op = removeFromArray2(op,i);
+			}
+
+		}
+		boolean empty = true;
+		for (Object ob : op) {
+			if (ob != null) {
+				empty = false;
+				break;
+			}
+		}
+		if (empty) {return operands[0];}
+		for (int i = 0; i < op.length; i++) {
+			if(!(op[i]==null)&&op[i].equals("OR")){
+
+				Vector<Record> bf = vecquick.get(i);
+				Vector<Record> af = vecquick.get(i+1);
+				bf.addAll(af);
+				LinkedHashSet<Record> hashSet = new LinkedHashSet<Record>(bf);
+				bf.clear();
+				bf.addAll(hashSet);
+
+
+
+
+				op =  removeFromArray2(op,i);
+			}
+
+		}
+		empty = true;
+		for (Object ob : op) {
+			if (ob != null) {
+				empty = false;
+				break;
+			}
+		}
+		if (empty) {return operands[0];}
+		for (int i = 0; i < op.length; i++) {
+			Vector<Record> LastmanStanding = new Vector<>();
+			if(!(op[i]==null)&&op[i].equals("XOR")){
+
+				Vector<Record> bf = vecquick.get(i);
+				Vector<Record> af = vecquick.get(i+1);
+				int length = Math.min(af.size(), bf.size());
+
+				for(int j = 0; j < length; j++){
+
+
+					if(bf.size()==length){
+						for(int k =0; k < af.size(); k++){
+							if ((vecquick.get(i).get(j).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))
+									.equals(vecquick.get(i+1).get(k).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))) {
+								LastmanStanding.add(vecquick.get(i).get(j));
+							}
+						}
+					}else {
+						for (int k = 0; k < bf.size(); k++) {
+							if ((operands[i + 1].get(j).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))
+									.equals(vecquick.get(i).get(k).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))) {
+
+								LastmanStanding.add(vecquick.get(i+1).get(j));
+							}
+						}
+					}
+				}
+				Vector<Record> r =  vecquick.get(i);
+				r.removeAll(LastmanStanding);
+				operands[i] = r;
+				vecquick.set(i,r);
+				op = removeFromArray2(op,i);
+			}
+
+		}
+		return operands[0];
+	}
+	public static Vector<Record> linearSearchTable(Table table, SQLTerm term, int x) throws IOException, ClassNotFoundException {
+		Vector<Record> records = new Vector<>();
+		for(String pageName : table.getPageNames()) {
+			Page page = DeserializePage(pageName,table.getTableName());
+			for (Record record : page.getTuples()) {
+				Object obj = record.getHm().get(term._strColumnName);
+				String y= term._strOperator;
+				//TODO: replace x with y and remove the number from method signature
+				switch (x) {
+					case 1:
+						if (((Comparable) obj).compareTo(term._objValue) == 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case 2:
+						if (((Comparable) obj).compareTo(term._objValue) <= 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case 3:
+						if (((Comparable) obj).compareTo(term._objValue) >= 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case 4:
+						if (((Comparable) obj).compareTo(term._objValue) < 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case 5:
+						if (((Comparable) obj).compareTo(term._objValue) > 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+				}
+			}
+		}
+		return records;
+	}
+	public static Vector<Record> linearSearchTable2(Table table, SQLTerm term) throws IOException, ClassNotFoundException {
+		Vector<Record> records = new Vector<>();
+		for(String pageName : table.getPageNames()) {
+			Page page = DeserializePage(pageName,table.getTableName());
+			for (Record record : page.getTuples()) {
+				Object obj = record.getHm().get(term._strColumnName);
+				String y= term._strOperator;
+				//TODO: replace x with y and remove the number from method signature
+				switch (y) {
+					case "=":
+						if (((Comparable) obj).compareTo(term._objValue) == 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case "<=":
+						if (((Comparable) obj).compareTo(term._objValue) <= 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case ">=":
+						if (((Comparable) obj).compareTo(term._objValue) >= 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case "<":
+						if (((Comparable) obj).compareTo(term._objValue) < 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+					case ">":
+						if (((Comparable) obj).compareTo(term._objValue) > 0) {
+							if(!records.contains(record))
+								records.add(record);
+						}
+						;
+						break;
+				}
+			}
+		}
+		return records;
+	}
 	/**
 	 @param arrSQLTerms: Array of conditions
 	 @param table: Query to be returned.
 	 @param strarrOperators: Array of operators
 	 @param t: Original table to traverse on.
 	 **/
-	public void ExecuteQuery(SQLTerm[] arrSQLTerms, Table3ashankhaterSeif table,String[] strarrOperators, Table t) throws IOException, ClassNotFoundException, DBAppException {
-		boolean ANDFlag = true;
-		int counter = 0;
-		boolean XORafterOR = false;
-		boolean XORExists = false;
-		boolean ANDafterOR = false;
-		boolean TrueFlag = false;
-		if (strarrOperators[0].equalsIgnoreCase("OR") && strarrOperators.length>1) {
-			for (int k = 1; k < strarrOperators.length; k++) {
-				if (strarrOperators[k].equalsIgnoreCase("XOR")){
-					XORafterOR = true;
-					break;
-				}
-				if (strarrOperators[k].equalsIgnoreCase("AND")){
-					ANDafterOR = true;
-					break;
-				}
-			}
-		}
-		for (int k = 0 ; k<strarrOperators.length ; k++){
-			if (strarrOperators[k].equalsIgnoreCase("XOR")){
-				XORExists = true;
-				break;
-			}
-		}
-		Vector<Record> records = new Vector<>();
-		for (String pageName : t.getPageNames()) {
-			Page page = DeserializePage(pageName, t.getTableName());
-			Vector<Record> tuples = page.getTuples();
-			records.addAll(tuples);
-		}
-			for (Record record : records) {
-				Hashtable<String, Object> ht = record.getHm();
-				for (Map.Entry<String, Object> entry : ht.entrySet()) {
-					String key = entry.getKey();
-					Object value = entry.getValue();
-					for (int i = 0; i < arrSQLTerms.length; i++) {
-						if (key.equalsIgnoreCase(arrSQLTerms[i]._strColumnName)) {
-							if (checkValidity(value, arrSQLTerms, i)) {
-								if (!XORExists) {
-									//if no xor in strarroperators
-									switch (arrSQLTerms[i]._strOperator) {
-										case "=":
-											if (value.equals(arrSQLTerms[0]._objValue) && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && value.equals(arrSQLTerms[1]._objValue) && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (!value.equals(arrSQLTerms[i])){
-													ANDFlag = false;
-												}
-											}
-											break;
-										case ">":
-											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) > 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) > 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0)){
-													ANDFlag = false;
-												}
-											}
-											break;
-										case ">=":
-											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) >= 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) >= 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0)){
-													ANDFlag = false;
-												}
-											}
-											break;
-										case "<":
-											if (i == 0 &&( (Comparable) value).compareTo(arrSQLTerms[0]._objValue) < 0  && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) < 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0)){
-													ANDFlag = false;
-												}
-											}
-											break;
-										case "<=":
-											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0)){
-													ANDFlag = false;
-												}
-											}
-											break;
-										case "!=":
-											if (!value.equals(arrSQLTerms[0]._objValue) && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (strarrOperators.length==1 && i==1 && !value.equals(arrSQLTerms[1]._objValue) && strarrOperators[0].equalsIgnoreCase("OR")){
-												TrueFlag = true;
-											}
-											else if (i==arrSQLTerms.length-1){
-												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
-													TrueFlag = true;
-												}
-											}
-											else if (!value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("AND")){
-												if (value.equals(arrSQLTerms[i])){
-													ANDFlag = false;
-												}
-											}
-											break;
-										default:
-											throw new DBAppException("Error: Invalid operator.");
-									}
-								}
-								else{ //Xor is the first operator
-									switch (arrSQLTerms[i]._strOperator) {
-										case "=":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && value.equals(arrSQLTerms[i]._objValue) && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (value.equals(arrSQLTerms[i]._objValue)){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((!value.equals(arrSQLTerms[i]._objValue)) && strarrOperators[i].equalsIgnoreCase("AND")){
-												ANDFlag = false;
-											}
-											else if(value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										case ">":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0) && strarrOperators[i].equalsIgnoreCase("AND"))){
-												ANDFlag = false;
-											}
-											else if(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										case ">=":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0) && strarrOperators[i].equalsIgnoreCase("AND"))){
-												ANDFlag = false;
-											}
-											else if(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										case "<":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0) && strarrOperators[i].equalsIgnoreCase("AND"))){
-												ANDFlag = false;
-											}
-											else if(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										case "<=":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0) && strarrOperators[i].equalsIgnoreCase("AND"))){
-												ANDFlag = false;
-											}
-											else if(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										case "!=":
-											if (i == arrSQLTerms.length - 1){ // last element in SQL
-												if (strarrOperators[i-1].equalsIgnoreCase("AND")&& ANDFlag && !value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-												else if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("XOR") && !value.equals(arrSQLTerms[i]._objValue) && ANDFlag){
-													counter++;
-												}
-												else if (strarrOperators[i-1].equalsIgnoreCase("OR") && !value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-												if (counter % 2 == 0) {
-													TrueFlag = false;
-												} else {
-													TrueFlag = true;
-												}
-											}
-											else if (strarrOperators.length==1){
-												if (!value.equals(arrSQLTerms[i]._objValue)){
-													counter++;
-												}
-											}
-											else if (i==0) {
-												if (!value.equals(arrSQLTerms[i]._objValue)){
-													if (strarrOperators[i].equalsIgnoreCase("XOR")){
-														counter++;
-													}
-													else if(strarrOperators[i].equalsIgnoreCase("OR")){
-														TrueFlag = true;
-													}
-												}
-											}
-											else if (!value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("XOR") && strarrOperators[i-1].equalsIgnoreCase("XOR")){
-												counter++;
-											}
-											else if ((value.equals(arrSQLTerms[i]._objValue)) && strarrOperators[i].equalsIgnoreCase("AND")){
-												ANDFlag = false;
-											}
-											else if(!value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
-												TrueFlag = true;
-											}
-											else if(!ANDFlag && strarrOperators[i].equalsIgnoreCase("OR")){
-												ANDFlag = true; //reset el ANDFlag back to normal
-											}
-											else if(strarrOperators[i].equalsIgnoreCase("XOR") && TrueFlag){
-												counter++;
-												TrueFlag = false;
-												ANDFlag = true;
-											}
-											break;
-										default:
-											throw new DBAppException("Error: Invalid operator.");
-									}
-								}
-							}
-						}
-					}
-				}
-				if (TrueFlag){
-					table.addRecord(record);
-				}
-				TrueFlag = false;
-				ANDFlag = true;
-				counter = 0;
-			}
-
-	}
-
 
 
 	/**
@@ -1436,37 +1403,36 @@ public class DBApp {
 			//		dbApp.insertIntoTable( strTableName , htblColNameValue );
 
 
-//					SQLTerm[] arrSQLTerms;
-//					arrSQLTerms = new SQLTerm[3];
-//					SQLTerm sql = new SQLTerm();
-//					SQLTerm sql2 = new SQLTerm();
-//					SQLTerm sql3 = new SQLTerm();
-//					arrSQLTerms[0] = sql;
-//					arrSQLTerms[1] = sql2;
-//					arrSQLTerms[2] = sql3;
-//					arrSQLTerms[0]._strTableName =  "Student";
-//					arrSQLTerms[0]._strColumnName=  "name";
-//					arrSQLTerms[0]._strOperator  =  "=";
-//					arrSQLTerms[0]._objValue     =  "Ahmed";
-//
-//					arrSQLTerms[1]._strTableName =  "Student";
-//					arrSQLTerms[1]._strColumnName=  "id";
-//					arrSQLTerms[1]._strOperator  =  "=";
-//					arrSQLTerms[1]._objValue     =  3 ;
-//
-//					arrSQLTerms[2]._strTableName =  "Student";
-//					arrSQLTerms[2]._strColumnName=  "gpa";
-//					arrSQLTerms[2]._strOperator  =  "=";
-//					arrSQLTerms[2]._objValue     =  0.77 ;
+			SQLTerm[] arrSQLTerms;
+			arrSQLTerms = new SQLTerm[2];
+			SQLTerm sql = new SQLTerm();
+			SQLTerm sql2 = new SQLTerm();
+			SQLTerm sql3 = new SQLTerm();
+			arrSQLTerms[0] = sql;
+			arrSQLTerms[1] = sql2;
+//			arrSQLTerms[2] = sql3;
+			arrSQLTerms[0]._strTableName =  "Student";
+			arrSQLTerms[0]._strColumnName=  "gpa";
+			arrSQLTerms[0]._strOperator  =  "<";
+			arrSQLTerms[0]._objValue     =   69.6;
+
+			arrSQLTerms[1]._strTableName =  "Student";
+			arrSQLTerms[1]._strColumnName=  "id";
+			arrSQLTerms[1]._strOperator  =  "<";
+			arrSQLTerms[1]._objValue     =   60 ;
+
+//			arrSQLTerms[2]._strTableName =  "Student";
+//			arrSQLTerms[2]._strColumnName=  "gpa";
+//			arrSQLTerms[2]._strOperator  =  "=";
+//			arrSQLTerms[2]._objValue     =   1.6 ;
 
 
-//
-//					String[] strarrOperators = new String[2];
-//					strarrOperators[0] = "OR";
-//					strarrOperators[1] = "OR";
-			// select * from Student where name = "John Noor" or gpa = 1.5;
-//					Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
-//					System.out.println(resultSet.toString());
+			String[] strarrOperators = new String[1];
+			strarrOperators[0] = "XOR";
+//			strarrOperators[1] = "OR";
+//			 select * from Student where name = "John Noor" or gpa = 1.5;
+					Iterator resultSet = dbApp.selectFromTable(arrSQLTerms , strarrOperators);
+					System.out.println(resultSet.toString());
 			// Perform deletion
 			//		dbApp.deleteFromTable(strTableName, htblColNameValue);
 

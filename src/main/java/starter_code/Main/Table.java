@@ -25,7 +25,7 @@ public class Table implements Serializable,Iterator<Table> {
   public void setMaxOfPages(Vector<Object> m) {
     this.maxOfPages = m;
   }
-
+  private static final long serialVersionUID = -558553967080513790L;
   private Vector<Object> maxOfPages;
 
   public Vector<Object> getminOfPages() {
@@ -139,7 +139,7 @@ public class Table implements Serializable,Iterator<Table> {
 //            p.getTuples().get(in - 1).setHm(ht);
 //            p.getTuples().get(in - 1).unsetNull();
 //          } else {
-            Record re = new Record(p.getName());
+            Record re = new Record(p.getName(), tableName);
             re.setHm(ht);
             p.getTuples().insertElementAt(re, in);
 //          }
@@ -157,7 +157,7 @@ public class Table implements Serializable,Iterator<Table> {
       v.get(0).setHm(ht);
       v.get(0).unsetNull();
     }else{
-      Record r = new Record(p.getName());
+      Record r = new Record(p.getName(), tableName);
       r.setHm(ht);
       v.insertElementAt(r,0);
     }

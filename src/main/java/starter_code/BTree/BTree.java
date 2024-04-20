@@ -19,13 +19,14 @@ import java.util.Vector;
  * @param < TKey > the data type of the key
  * @param < TValue > the data type of the value
  */
+
 public class BTree<TKey extends Comparable<TKey>, TValue> implements Serializable {
     /**
      * @uml.property name="root"
      * @uml.associationEnd multiplicity="(1 1)"
      */
     private BTreeNode<TKey> root;
-
+    private static final long serialVersionUID = -558253967080513790L;
     public int getSize() {
         return size;
     }
@@ -213,7 +214,40 @@ public class BTree<TKey extends Comparable<TKey>, TValue> implements Serializabl
         }
     }
 
-
+//    public ArrayList<String> search(Object lowerBound, Object upperBound) {
+//
+//
+//
+//        // Instantiate Double array to hold values
+//        ArrayList<String> values = new ArrayList<>();
+//
+//        // Iterate through the doubly linked list of leaves
+//        BTreeLeafNode<TKey, TValue> currNode = (BTreeLeafNode<TKey, TValue>) this.root;
+//        while (currNode != null) {
+//
+//            // Iterate through the dictionary of each node
+//            Object keys[] = currNode.keys;
+//            Object values1[] = currNode.values;
+//            for (int i = 0;i<keys.length;i++) {
+//
+//                /* Stop searching the dictionary once a null value is encountered
+//                   as this the indicates the end of non-null values /
+//                if (keys[i] == null && values1[i] == null) { break; }
+//
+//                // Include value if its key fits within the provided range
+//                if (((Comparable)lowerBound).compareTo(keys[i]) <= 0 &&  ((Comparable)upperBound).compareTo(keys[i]) <= 0) {
+//                    values.add((String) values1[i]);
+//                }
+//            }
+//
+//            / Update the current node to be the right sibling,
+//               leaf traversal is from left to right */
+//                currNode = (BTreeLeafNode<TKey, TValue>) currNode.rightSibling;
+//
+//            }
+//}
+//            return values;
+//        }
 
     public static void main(String[] args) throws IOException {
         BTree tree = new BTree("Student","gpa","gpaIndex");

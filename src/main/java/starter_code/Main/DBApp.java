@@ -26,7 +26,6 @@ import static starter_code.Serialization.Deserialize.DeserializeTable;
 
 
 public class DBApp {
-	Iterator table = null;
 	private Vector<Table> tables;
 
 	public DBApp( ) throws IOException, ClassNotFoundException {
@@ -35,7 +34,7 @@ public class DBApp {
 		for(String s : getTableNames("metadata.csv")){
 			File f = new File("starter_code/"+s+"/"+s+".class");
 			if(f.exists()&& !f.isDirectory()){
-				Table t = Deserialize.DeserializeTable(s);
+				Table t = DeserializeTable(s);
 				tables.add(t);
 				Serialize.Serializethis(s, t, s);}
 		}
@@ -80,7 +79,11 @@ public class DBApp {
 	// type as value
 
 
-
+/**
+ @param htblColNameType: attributes of the table
+ @param strTableName: Name of the table to be created
+ @param strClusteringKeyColumn: Primary key of the table
+ **/
 	public void createTable(String strTableName,
 							String strClusteringKeyColumn,
 							Hashtable<String,String> htblColNameType) throws DBAppException {
@@ -132,7 +135,11 @@ public class DBApp {
 		}
 	}
 
-
+	/**
+	 @param strTableName: Name of the table the index will be created on
+	 @param strColName: Name of column the index will be made on
+	 @param strIndexName: Name of the index to be created
+	 **/
 	// following method creates a B+tree index
 	public void createIndex(String   strTableName,
 							String   strColName,
@@ -164,7 +171,7 @@ public class DBApp {
 
 						File f = new File(strTableName + strIndexName + ".class");
 						if (!f.exists()) {
-							Table deserializedTable = Deserialize.DeserializeTable(strTableName);
+							Table deserializedTable = DeserializeTable(strTableName);
 
 							BTree tree = new BTree( strTableName, strColName,strIndexName);
 
@@ -216,13 +223,19 @@ public class DBApp {
 
 	//         following method inserts one row only.
 //	 htblColNameValue must include a value for the primary key
-
+	/**
+	 @param Location: is the location the search will be on
+	 **/
 	public boolean fileExists(File Location){
 		return (Location.exists() && !Location.isDirectory());
 	}
 	public boolean sizeCheck(int col1, int col2){
 		return (col1 == col2);
 	}
+	/**
+	 @param column:a vector that contains the data of the columns from the metadata
+	 @param htblColNameValue: the input to be inserted from insertintotable method
+	 **/
 	public boolean tableDataTypeCheck(Vector column, Hashtable<String,Object> htblColNameValue){
 		boolean Flag = true;
 		for (int i = 0; i < column.size(); i++) {
@@ -236,6 +249,12 @@ public class DBApp {
 		}
 		return Flag;
 	}
+
+
+	/**
+	 @param column:a vector that contains the data of the columns from the metadata
+	 @return a string that contains the name of the clusteringkey
+	 **/
 	public static String clusteringKey_ID(Vector column){
 		String clusteringKey = "";
 		for (int i = 0; i < column.size(); i++) {
@@ -247,6 +266,13 @@ public class DBApp {
 		return clusteringKey;
 	}
 
+
+	/**
+	 @param tab: refrence pointer to the table to be inserted in
+	 @param column:a vector that contains the data of the columns from the metadata
+	 @param strTableName: The name of the table to be inserted in
+	 @param htblColNameValue the record to be inserted into table
+	 **/
 	public void addBPlussTree(Table tab, Vector column, String strTableName, String Key, Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException {
 		Vector<String> treeNames = tab.getTreesNames();
 		for (int i = 0; i < column.size(); i++){
@@ -269,7 +295,11 @@ public class DBApp {
 			}
 		}
 	}
-
+	/**
+	 @param column:
+	 @param htblColNameValue:
+	 @return if the name of the column name in insert methood matches the one of those in the metadata
+	 **/
 	public boolean comparecolumname(Vector column,Hashtable<String, Object> htblColNameValue){
 		for (int i = 0; i < column.size(); i++) {
 			Vector c= (Vector) column.get(i);
@@ -279,6 +309,11 @@ public class DBApp {
 		}
 		return true;
 	}
+	/**
+	 @param strTableName: Name of the table the index will be created on
+	 @param htblColNameValue: The values to be inserted
+	 **/
+
 	public void insertIntoTable(String strTableName,
 								Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
@@ -334,6 +369,11 @@ public class DBApp {
 			throw new DBAppException("Table Not Found");
 		}
 	}
+
+	/**
+	 @param value: the object's type will be checked on
+	@param colType: the expected type that value should be
+	 **/
 	private static boolean isDataTypeMatching2(Object value, String colType) {
 		String valueType = value.getClass().getName();
 		if (Objects.equals(colType, "java.lang.double") && valueType.equals("java.lang.Double")){
@@ -343,7 +383,9 @@ public class DBApp {
 		}
 	}
 
-
+	/**
+	 @param strTableName: the table to be checked whether its in the metadata
+	 **/
 	//check wheather a given table name is in the csv file
 	public static boolean searchMetadata(String strTableName) {
 		String csvFile = "metadata.csv";
@@ -360,6 +402,11 @@ public class DBApp {
 		}
 		return false;
 	}
+
+	/**
+	 @param strTableName: table name
+	 @return: the column names and data
+	 **/
 	//reads the collums from a given table name from csv
 	public static Vector<Vector<String>> columnNameReader (String strTableName){
 		String csvFile = "metadata.csv";
@@ -387,6 +434,12 @@ public class DBApp {
 		return column;
 	}
 
+	/**
+	 	@param tableName: the name of the table
+	 @param page: pointer to the page to be searched in
+	 @param pk: the primary key
+	 @return : the record that is the result of the primary key
+	 **/
 	public static Record binarySearchPage(String tableName, Page page, Object pk) throws IOException, ClassNotFoundException {
 		int i = 0, j = page.getNumberofRowsraw();
 		while(i <= j){
@@ -407,6 +460,12 @@ public class DBApp {
 	// htblColNameValue holds the key and new value
 	// htblColNameValue will not include clustering key as column name
 	// strClusteringKeyValue is the value to look for to find the row to update.
+
+	/**
+	 @param strTableName: the name of the table
+	 @param strClusteringKeyValue: the value of the primary key
+	 @param htblColNameValue: the updated record to be used to modify the original record
+	 **/
 	public void updateTable(String strTableName,
 							String strClusteringKeyValue,
 							Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
@@ -433,7 +492,7 @@ public class DBApp {
 			dataType = "string";  // It's a string if it's not an integer or double
 		}
 		if (searchMetadata(strTableName)) {
-			Table table = Deserialize.DeserializeTable(strTableName);
+			Table table = DeserializeTable(strTableName);
 			if(table.getPageNames().isEmpty())
 				throw new DBAppException("Table is Empty");
 			Vector<Vector<String>> column = columnNameReader(strTableName);
@@ -486,6 +545,12 @@ public class DBApp {
 			throw new DBAppException("Table Not Found");
 		}
 	}
+
+	/**
+	 @param  page: pointer to a page
+	 @param record : pointer to a record
+	 @return the record number
+	  **/
 	public static int getRecordNumber(Page page, Record record){
 		int i = 0, j = page.getNumberofRowsraw();
 		Object pk = record.getHm().get(getPrimaryKey(page.getTableName()));
@@ -503,7 +568,10 @@ public class DBApp {
 	}
 
 
-
+	/**
+	 @param str: a string that may contain an integer
+	 @return the result of the possibility of conversion to int
+	 * **/
 	public static Integer mayParse(String str) {
 		try {
 			return Integer.parseInt(str);
@@ -511,6 +579,10 @@ public class DBApp {
 			return null;
 		}
 	}
+	/**
+	 @param str: a string that may contain a double
+	 @return the result of the possibility of conversion to double
+	  **/
 	public static Double mayParse2(String str) {
 		try {
 			return Double.parseDouble(str);
@@ -522,13 +594,9 @@ public class DBApp {
 
 
 
-
-
-
-
 	public static Record binarySearch(String tableName , Object pk) throws DBAppException, IOException, ClassNotFoundException {
 		try{
-			Table table = Deserialize.DeserializeTable(tableName);
+			Table table = DeserializeTable(tableName);
 			int n = table.getPageNames().size();
 			int l = 0 , r = n-1;
 			Vector<Object> maxes = table.getMaxOfPages();
@@ -577,13 +645,18 @@ public class DBApp {
 	// htblColNameValue holds the key and value. This will be used in search
 	// to identify which rows/tuples to delete.
 	// htblColNameValue entries are ANDED together
+
+	/**
+	 @param strTableName: the name of the table
+	 @param htblColNameValue: the combination of the values to be deleted
+	 * **/
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		if (searchMetadata(strTableName)) {
 			Vector column = columnNameReader(strTableName);
 
 			Table deserializedTable = null;
 			try {
-				deserializedTable = Deserialize.DeserializeTable(strTableName);
+				deserializedTable = DeserializeTable(strTableName);
 			} catch (IOException | ClassNotFoundException e) {
 				throw new DBAppException("Could not deserialize Table");
 			}
@@ -603,7 +676,10 @@ public class DBApp {
 
 
 
-
+	/**
+	 @param value: the object's type will be checked on
+	 @param colType: the expected type that value should be
+	 **/
 	// Method to check if the data type of value matches the expected data type for a column
 	private boolean isDataTypeMatching(Object value, String colType) {
 		String valueType = value.getClass().getName();
@@ -623,6 +699,13 @@ public class DBApp {
 		return colType.equals(valueType);
 	}
 
+
+
+	/**
+	 @param arrSQLTerms : Array of query conditions.
+	 @param strarrOperators : Operators between conditions.
+	 @return : The Query to be returned.
+	 **/
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 									String[]  strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
 		if(arrSQLTerms.length > 0) {
@@ -659,32 +742,32 @@ public class DBApp {
 										switch (arrSQLTerms[0]._strOperator) {
 											case "=":
 												if (value.equals(arrSQLTerms[0]._objValue)) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											case ">":
 												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) > 0) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											case ">=":
 												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) >= 0) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											case "<":
 												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) < 0) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											case "<=":
 												if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											case "!=":
 												if (!value.equals(arrSQLTerms[0]._objValue)) {
-													((Table3ashankhaterSeif) table).addRecord(ht);
+													((Table3ashankhaterSeif) table).addRecord(record);
 												}
 												break;
 											default:
@@ -709,7 +792,12 @@ public class DBApp {
 		}
 	}
 
-
+	/**
+	 @param arrSQLTerms: Array of conditions
+	 @param table: Query to be returned.
+	 @param strarrOperators: Array of operators
+	 @param t: Original table to traverse on.
+	 **/
 	public void ExecuteQuery(SQLTerm[] arrSQLTerms, Table3ashankhaterSeif table,String[] strarrOperators, Table t) throws IOException, ClassNotFoundException, DBAppException {
 		boolean ANDFlag = true;
 		int counter = 0;
@@ -750,123 +838,131 @@ public class DBApp {
 						if (key.equalsIgnoreCase(arrSQLTerms[i]._strColumnName)) {
 							if (checkValidity(value, arrSQLTerms, i)) {
 								if (!XORExists) {
-									//if strarroperator[0] is OR
+									//if no xor in strarroperators
 									switch (arrSQLTerms[i]._strOperator) {
 										case "=":
-											if (value.equals(arrSQLTerms[i]._objValue) && i==0 && strarrOperators[i].equalsIgnoreCase("OR)") ) {
+											if (value.equals(arrSQLTerms[0]._objValue) && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && value.equals(arrSQLTerms[1]._objValue)) {
+											}
+											else if (strarrOperators.length==1 && i==1 && value.equals(arrSQLTerms[1]._objValue) && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && value.equals(arrSQLTerms[i]._objValue)) {
-														TrueFlag = true;
-													}
-												}
-											} else if (value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR")) {
+											}
+											else if (value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
 												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag && strarrOperators[i].equalsIgnoreCase("XOR")) {
-												i = arrSQLTerms.length - 1;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (!value.equals(arrSQLTerms[i])){
+													ANDFlag = false;
+												}
 											}
 											break;
 										case ">":
-											if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && i == 0) {
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) > 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0) {
+											}
+											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) > 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && strarrOperators[i].equalsIgnoreCase("OR")) {
-												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag) {
-
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0) {
-														TrueFlag = true;
-													}
+											}
+											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
+												TrueFlag = true;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) > 0)){
+													ANDFlag = false;
 												}
 											}
 											break;
 										case ">=":
-											if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && i == 0) {
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) >= 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0) {
+											}
+											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) >= 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && strarrOperators[i].equalsIgnoreCase("OR")) {
-												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag) {
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0) {
-														TrueFlag = true;
-													}
+											}
+											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
+												TrueFlag = true;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) >= 0)){
+													ANDFlag = false;
 												}
 											}
 											break;
 										case "<":
-											if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && i == 0) {
+											if (i == 0 &&( (Comparable) value).compareTo(arrSQLTerms[0]._objValue) < 0  && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0) {
+											}
+											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[1]._objValue) < 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && strarrOperators[i].equalsIgnoreCase("OR")) {
-												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag) {
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0) {
-														TrueFlag = true;
-													}
+											}
+											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
+												TrueFlag = true;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) < 0)){
+													ANDFlag = false;
 												}
 											}
 											break;
 										case "<=":
-											if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && i == 0) {
+											if (((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0 && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0) {
+											}
+											else if (strarrOperators.length==1 && i==1 && ((Comparable) value).compareTo(arrSQLTerms[0]._objValue) <= 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && strarrOperators[i].equalsIgnoreCase("OR")) {
-												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag) {
-
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && ((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0) {
-														TrueFlag = true;
-													}
+											}
+											else if (((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0 && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
+												TrueFlag = true;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (!(((Comparable) value).compareTo(arrSQLTerms[i]._objValue) <= 0)){
+													ANDFlag = false;
 												}
 											}
 											break;
 										case "!=":
-											if (!value.equals(arrSQLTerms[0]._objValue) && i == 0) {
+											if (!value.equals(arrSQLTerms[0]._objValue) && i == 0 && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (strarrOperators.length == 1 && i == 1 && !value.equals(arrSQLTerms[1]._objValue)) {
+											}
+											else if (strarrOperators.length==1 && i==1 && !value.equals(arrSQLTerms[1]._objValue) && strarrOperators[0].equalsIgnoreCase("OR")){
 												TrueFlag = true;
-											} else if (!value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR")) {
-												TrueFlag = true;
-											} else if (XORafterOR && !TrueFlag) {
-
-											} else if (i == arrSQLTerms.length - 1) {
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("AND") && ANDFlag) {
+											}
+											else if (i==arrSQLTerms.length-1){
+												if (strarrOperators[strarrOperators.length-1].equalsIgnoreCase("AND") && ANDFlag){
 													TrueFlag = true;
 												}
-												if (strarrOperators[strarrOperators.length - 1].equalsIgnoreCase("XOR")) {
-													if (!TrueFlag && !value.equals(arrSQLTerms[i]._objValue)) {
-														TrueFlag = true;
-													}
+											}
+											else if (!value.equals(arrSQLTerms[i]._objValue) && strarrOperators[i].equalsIgnoreCase("OR") && ANDFlag){
+												TrueFlag = true;
+											}
+											else if(strarrOperators[i].equalsIgnoreCase("AND")){
+												if (value.equals(arrSQLTerms[i])){
+													ANDFlag = false;
 												}
 											}
 											break;
@@ -1185,7 +1281,7 @@ public class DBApp {
 					}
 				}
 				if (TrueFlag){
-					table.addRecord(ht);
+					table.addRecord(record);
 				}
 				TrueFlag = false;
 				ANDFlag = true;
@@ -1194,6 +1290,14 @@ public class DBApp {
 
 	}
 
+
+
+	/**
+	 @param value: value of the key
+	 @param arrSQLTerms: array of conditions
+	 @param i: index of the condition
+	 @return : True if valid data type. False if invalid, i.e name<24
+	 **/
 	public boolean checkValidity(Object value, SQLTerm[] arrSQLTerms, int i){
 		if (value instanceof Integer || value instanceof Double){
 			if (arrSQLTerms[i]._objValue instanceof Integer || arrSQLTerms[i]._objValue instanceof Double){
@@ -1212,6 +1316,11 @@ public class DBApp {
 			}
 		}
 	}
+
+	/**
+	 @param strTableName: the name of the table
+	 @return : the name of the primary key
+	 * **/
 	public static String getPrimaryKey(String strTableName) {
 		String csvFile = "metadata.csv";
 		try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
@@ -1230,7 +1339,12 @@ public class DBApp {
 
 	// below method returns Iterator with result set if passed
 // strbufSQL is a select, otherwise returns null.
-	public Iterator parseSQL( StringBuffer strbufSQL) throws DBAppException{
+
+	/**
+	 @param strbufSQL :
+	 @return :
+	 * **/
+	public Iterator parseSQL(StringBuffer strbufSQL) throws DBAppException{
 		new myVisitor().visit(new SQLParser(new CommonTokenStream(new SQLLexer(fromString(strbufSQL.toString())))).parse());
         return null;
 		}
@@ -1244,7 +1358,7 @@ public class DBApp {
 //			String st = "java.lang.String";
 //			String in = "java.lang.Integer";
 //			String dou = "java.lang.double";
-			StringBuffer sqlBuffer = new StringBuffer();
+//			StringBuffer sqlBuffer = new StringBuffer();
 //			sqlBuffer.append("CREATE TABLE \"Student\" (\"id\" INT PRIMARY KEY, \"name\" STRING, \"gpa\" DOUBLE);");
 //			dbApp.parseSQL(sqlBuffer);
 //			sqlBuffer.delete(0,sqlBuffer.length());
@@ -1257,10 +1371,10 @@ public class DBApp {
 //			sqlBuffer.append("UPDATE \"Student\" SET \"gpa\" = 0.42 ,\"name\"=\"ZZ\" WHERE \"id\" = 1;");
 //			dbApp.parseSQL(sqlBuffer);
 //			sqlBuffer.delete(0,sqlBuffer.length());
-//			sqlBuffer.append("DELETE FROM \"Student\" WHERE \"name\" = \"Bober Kurwa\" AND \"gpa\" = 2;");
+//			sqlBuffer.append("DELETE FROM \"Student\";");
 //			dbApp.parseSQL(sqlBuffer);
 //			sqlBuffer.delete(0,sqlBuffer.length());
-//			sqlBuffer.append("SELECT * FROM \"Student\" WHERE \"id\" != 3;");
+//			sqlBuffer.append("SELECT * FROM \"Student\" WHERE \"gpa\" = 50.6 AND \"id\" = 4;");
 //			dbApp.parseSQL(sqlBuffer);
 
 //			Hashtable htblColNameType = new Hashtable();
@@ -1274,8 +1388,8 @@ public class DBApp {
 //			for(int i=0;i<201;i++){
 //			Hashtable htblColNameValue = new Hashtable();
 //			htblColNameValue.put("id", i);
-//			htblColNameValue.put("name", "A"+i);
-//			htblColNameValue.put("gpa",0.7);
+//			htblColNameValue.put("name", "Ahmed");
+//			htblColNameValue.put("gpa",i+0.6);
 //			dbApp.insertIntoTable( "Student" , htblColNameValue );
 //			}
 

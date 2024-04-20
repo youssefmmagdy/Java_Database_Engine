@@ -17,7 +17,7 @@ class BTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BTreeNode<TKe
 	 * @uml.associationEnd multiplicity="(0 -1)" elementType="java.lang.Boolean"
 	 */
 	private ArrayList<Boolean> filters;
-
+	private static final long serialVersionUID = -558553967083514790L;
 	public BTreeLeafNode() {
 		this.filters = new ArrayList<>();
 		this.keys = new Object[LEAFORDER + 1];

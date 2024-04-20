@@ -13,8 +13,7 @@ import java.util.*;
 import starter_code.Main.Record.*;
 import static starter_code.Main.DBApp.*;
 import static starter_code.Main.Table.*;
-import static starter_code.Serialization.Deserialize.DeserializePage;
-import static starter_code.Serialization.Deserialize.DeserializeTree;
+import static starter_code.Serialization.Deserialize.*;
 
 public class awel3alanedeef {
 
@@ -84,32 +83,11 @@ public class awel3alanedeef {
 
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[]  strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
         if(arrSQLTerms.length > 0) {
-            Table deserializedTable = Deserialize.DeserializeTable(arrSQLTerms[0]._strTableName);
+            Table deserializedTable = DeserializeTable(arrSQLTerms[0]._strTableName);
             if (deserializedTable.getPageNames().isEmpty())
                 throw new DBAppException("Table is Empty");
         }
         boolean flag = false;
-        boolean XORflag = true;
-        boolean ANDflag = true;
-        boolean ORflag = true;
-        boolean XORExists = false;
-        //Stack<SQLTerm[]> s = new Stack<>();
-        for (int k = 0; k<strarrOperators.length;k++){
-            if (strarrOperators[k].equalsIgnoreCase("AND")){
-                ANDflag = false;
-            }
-        }
-        for (int k = 0; k<strarrOperators.length;k++){
-            if (strarrOperators[k].equalsIgnoreCase("XOR")){
-                XORflag = false;
-                XORExists = true;
-            }
-        }
-        for (int k = 0; k<strarrOperators.length;k++){
-            if (strarrOperators[k].equalsIgnoreCase("OR")){
-                ORflag = false;
-            }
-        }
         Table v = new Table("Student");
         // useless line but ill keep it for reference -> Iterator operators = Arrays.stream(strarrOperators).iterator();
         // idk what to do with this--> bplustree tree = new bplustree(deserializedTable.getNumberOfRows());
@@ -119,6 +97,7 @@ public class awel3alanedeef {
             if (v.getTableName().equals(arrSQLTerms[0]._strTableName) && searchMetadata(arrSQLTerms[0]._strTableName)) {
                 flag = true;
                 table = new Table3ashankhaterSeif();
+
                 if (strarrOperators.length == 0) {
                     for (String pageName : v.getPageNames()) {
                         Page page = DeserializePage(pageName, v.getTableName());
@@ -189,41 +168,38 @@ public class awel3alanedeef {
                             }
                         }
                     }
-                } else {
-
+                } else
+                {
                     Vector<String> indexedColumns = getIndexedColumns(columnNameReader(v.getTableName()));
 
-                    boolean flag1 = false, flag2 = false;
+
                     // checks on Primary Keys & Indexed
 
-                    for (int i = 0; i < arrSQLTerms.length; i++) {
-                        flag1 = true;
+                    for(int i = 0;i < arrSQLTerms.length;i++) {
+
                         Vector<Record> records = new Vector<>();
 
-                        if (arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)) {
+                        if(vectors[i] == null && arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)){
+
                             String treeName = getTreeName(columnNameReader(v.getTableName()), arrSQLTerms[i]._strColumnName);
                             BTree tree = DeserializeTree(treeName, v.getTableName());
 
-                            switch (arrSQLTerms[i]._strOperator) {
+                            switch (arrSQLTerms[i]._strOperator){
                                 case "=":
                                     String s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
-                                    Page page = DeserializePage(getPageName(s), v.getTableName());
-                                    Record record = binarySearchPage(v.getTableName(), page, arrSQLTerms[i]._objValue);
+                                    Page page = DeserializePage(getPageName(s) , v.getTableName());
+                                    Record record = binarySearchPage(v.getTableName(),page,arrSQLTerms[i]._objValue);
                                     records.add(record);
-                                    break;
-                                case "<=":
-                                    break;
-                                case ">=":
-                                    break;
-                                case "<":
-                                    break;
-                                case ">":
-                                    break;
+                                    ;break;
+                                case "<=": ;break;
+                                case ">=": ;break;
+                                case "<": ;break;
+                                case ">": ;break;
                             }
 
                             String s = (String) tree.search((Comparable) arrSQLTerms[i]._objValue);
-                            Page page = DeserializePage(getPageName(s), v.getTableName());
-                            Record record = binarySearchPage(v.getTableName(), page, arrSQLTerms[i]._objValue);
+                            Page page = DeserializePage(getPageName(s) , v.getTableName());
+                            Record record = binarySearchPage(v.getTableName(),page,arrSQLTerms[i]._objValue);
                             records.add(record);
 
                             vectors[i] = records;
@@ -232,30 +208,41 @@ public class awel3alanedeef {
 
 
                     }
-                    if (!flag1) {
+
                         // checks on Primary Keys (Not Indexed)
-                        for (int i = 0; i < arrSQLTerms.length; i++) {
-                            flag2 = true;
+                        for(int i = 0;i < arrSQLTerms.length;i++) {
                             Vector<Record> records = new Vector<>();
-                            if (arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && !indexedColumns.contains(arrSQLTerms[i]._strColumnName)) {
+                            if(vectors[i] == null && arrSQLTerms[i]._strColumnName.equals(getPrimaryKey(v.getTableName())) && ! indexedColumns.contains(arrSQLTerms[i]._strColumnName)){
 
-
-                                switch (arrSQLTerms[i]._strOperator) {
+                                Vector<Record> records1 = new Vector<>();
+                                switch (arrSQLTerms[i]._strOperator){
                                     case "=":
-                                        Record record = binarySearch(v.getTableName(), arrSQLTerms[i]._objValue);
+                                        Record record = binarySearch(v.getTableName(),arrSQLTerms[i]._objValue);
                                         records.add(record);
-                                        ;
-                                        break;
+                                        ;break;
                                     case "<=":
-                                        ;
+                                        records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],2);
+                                        while(!records1.isEmpty()){
+                                            records.add(records1.remove(0));
+                                        }
                                         break;
                                     case ">=":
-                                        ;
+                                        records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],3);
+                                        while(!records1.isEmpty()){
+                                            records.add(records1.remove(0));
+                                        }
                                         break;
                                     case "<":
-                                        ;
+                                        records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],4);
+                                        while(!records1.isEmpty()){
+                                            records.add(records1.remove(0));
+                                        }
                                         break;
                                     case ">":
+                                        records1 = linearSearchTable(DeserializeTable(v.getTableName()),arrSQLTerms[i],5);
+                                        while(!records1.isEmpty()){
+                                            records.add(records1.remove(0));
+                                        }
                                         ;
                                         break;
                                 }
@@ -264,11 +251,12 @@ public class awel3alanedeef {
                             }
 
                         }
-                    } else if (!flag1 && !flag2) {
+
+
                         // checks on Indexed Only
                         for (int i = 0; i < arrSQLTerms.length; i++) {
                             Vector<Record> records = new Vector<>();
-                            if (!arrSQLTerms[i].equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)) {
+                            if (vectors[i] == null && !arrSQLTerms[i].equals(getPrimaryKey(v.getTableName())) && indexedColumns.contains(arrSQLTerms[i]._strColumnName)) {
                                 String treeName = getTreeName(columnNameReader(v.getTableName()), arrSQLTerms[i]._strColumnName);
                                 BTree tree = DeserializeTree(treeName, v.getTableName());
 
@@ -307,16 +295,31 @@ public class awel3alanedeef {
                                     tree.insert(strarrOperators[i], tmp.search(strarrOperators[i]));
                                     tmp.delete(strarrOperators[i]);
                                 }
+
                             }
-                            vectors[i] = records;
+
                         }
-                    } else {
-//						vectors[i] = all records
-                    }
+
+
+                        for(int i = 0;i < arrSQLTerms.length;i++) {
+                            if(vectors[i] == null)
+                                vectors[i] = linearSearchTable2(DeserializeTable(v.getTableName()), arrSQLTerms[i]);
+
+                        }
+                        Vector<Record> records = Solver(vectors, strarrOperators);
+                        for(int i=0;i<records.size();i++){
+                                ((Table3ashankhaterSeif) table).addRecord(records.get(i));
+                        }
+                        return table;
+
+
                 }
             }
         if (flag){
+            table = (Iterator) Solver(vectors,strarrOperators);
+            System.out.println("done");
             return table;
+
         }
         else{
             throw new DBAppException("Table not found.");
@@ -377,13 +380,34 @@ public class awel3alanedeef {
         }
     }
 
-    public static Object[] removeFromArray(Object[] array, int tbr){
-        Object[] newobj = new Object[array.length-1];
-        for(int i = 0; i < array.length-1; i++){
+    public static Vector<Record>[] removeFromArray(Vector<Record>[] array, int tbr){
+        Vector<Record>[] newobj = new Vector[array.length];
+        for(int i = 0; i < array.length; i++){
             if(i!=tbr){
                 newobj[i] = array[i];
             }
         }
+//        Vector<Record>[] newnewobj = new Vector[array.length-1];
+//        for(int i = 0; i < array.length-1; i++){
+//            if(!(newobj[i]==null)){
+//                newnewobj[i] = newobj[i];
+//            }
+//        }
+        return newobj;
+    }
+ public static String[] removeFromArray2(String[] array, int tbr){
+     String[] newobj = new String[array.length];
+        for(int i = 0; i < array.length; i++){
+            if(i!=tbr){
+                newobj[i] = array[i];
+            }
+        }
+//     String[] newnewobj = new String[array.length-1];
+//        for(int i = 0; i < array.length-1; i++){
+//            if(!(newobj[i]==null)){
+//                newnewobj[i] = newobj[i];
+//            }
+//        }
         return newobj;
     }
 
@@ -394,35 +418,57 @@ public class awel3alanedeef {
     if((operands.length-op.length)!=1){
         throw new DBAppException("Difference should be 1");
     }
+    Vector<Vector<Record>> vecquick = new Vector<>();
+    for(int i =0; i<operands.length;i++){
+        vecquick.add(operands[i]);
+    }
     for (int i = 0; i < op.length; i++) {
         Vector<Record> LastmanStanding = new Vector<>();
-        if(op[i].equals("AND")){
+        if(!(op[i]==null)&&op[i].equals("AND")){
 
-            Vector<Record> bf = operands[i];
-            Vector<Record> af = operands[i+1];
+            Vector<Record> bf = vecquick.get(i);
+            Vector<Record> af = vecquick.get(i+1);
             int length = Math.min(af.size(), bf.size());
 
             for(int j = 0; j < length; j++){
-                for(int k =0; k < af.size(); k++){
-                    if(operands[i].get(j)==operands[i+1].get(k)){
 
-                        LastmanStanding.add(operands[i].get(j));
+
+                if(bf.size()==length){
+                for(int k =0; k < af.size(); k++){
+                    if ((vecquick.get(i).get(j).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))
+                            .equals(vecquick.get(i+1).get(k).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))) {
+                        LastmanStanding.add(vecquick.get(i).get(j));
+                    }
+                }
+                }else {
+                    for (int k = 0; k < bf.size(); k++) {
+                        if ((operands[i + 1].get(j).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))
+                                .equals(vecquick.get(i).get(k).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))) {
+
+                            LastmanStanding.add(vecquick.get(i+1).get(j));
+                        }
                     }
                 }
             }
-                operands[i] = LastmanStanding;
-            op = (String[]) removeFromArray(op,i);
-            operands = (Vector<Record>[]) removeFromArray(operands,i+1);
+            operands[i] = LastmanStanding;
+
+            op = removeFromArray2(op,i);
         }
 
     }
+        boolean empty = true;
+        for (Object ob : op) {
+            if (ob != null) {
+                empty = false;
+                break;
+            }
+        }
+            if (empty) {return operands[0];}
         for (int i = 0; i < op.length; i++) {
-            Vector<Record> LastmanStanding = new Vector<>();
-            if(op[i].equals("OR")){
+            if(!(op[i]==null)&&op[i].equals("OR")){
 
-                Vector<Record> bf = operands[i];
-                Vector<Record> af = operands[i+1];
-                int length = Math.min(af.size(), bf.size());
+                Vector<Record> bf = vecquick.get(i);
+                Vector<Record> af = vecquick.get(i+1);
                 bf.addAll(af);
                 LinkedHashSet<Record> hashSet = new LinkedHashSet<Record>(bf);
                 bf.clear();
@@ -431,41 +477,188 @@ public class awel3alanedeef {
 
 
 
-                op = (String[]) removeFromArray(op,i);
-                operands = (Vector<Record>[]) removeFromArray(operands,i+1);
+                op =  removeFromArray2(op,i);
             }
 
         }
+        empty = true;
+        for (Object ob : op) {
+            if (ob != null) {
+                empty = false;
+                break;
+            }
+        }
+        if (empty) {return operands[0];}
         for (int i = 0; i < op.length; i++) {
             Vector<Record> LastmanStanding = new Vector<>();
-            if(op[i].equals("XOR")){
+            if(!(op[i]==null)&&op[i].equals("XOR")){
 
-                Vector<Record> bf = operands[i];
-                Vector<Record> af = operands[i+1];
+                Vector<Record> bf = vecquick.get(i);
+                Vector<Record> af = vecquick.get(i+1);
                 int length = Math.min(af.size(), bf.size());
 
                 for(int j = 0; j < length; j++){
-                    for(int k =0; k < af.size(); k++){
-                        if(operands[i].get(j)==operands[i+1].get(k)){
-                            LastmanStanding.add(operands[i].get(j));
+
+
+                    if(bf.size()==length){
+                        for(int k =0; k < af.size(); k++){
+                            if ((vecquick.get(i).get(j).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))
+                                    .equals(vecquick.get(i+1).get(k).getHm().get(getPrimaryKey(operands[0].get(0).getTableName())))) {
+                                LastmanStanding.add(vecquick.get(i).get(j));
+                            }
+                        }
+                    }else {
+                        for (int k = 0; k < bf.size(); k++) {
+                            if ((operands[i + 1].get(j).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))
+                                    .equals(vecquick.get(i).get(k).getHm().get(getPrimaryKey(operands[0].get(j).getTableName())))) {
+
+                                LastmanStanding.add(vecquick.get(i+1).get(j));
+                            }
                         }
                     }
                 }
-                      Vector<Record> r =  operands[i];
+                      Vector<Record> r =  vecquick.get(i);
                       r.removeAll(LastmanStanding);
                       operands[i] = r;
-                      op = (String[]) removeFromArray(op,i);
-                      operands = (Vector<Record>[]) removeFromArray(operands,i+1);
+                      vecquick.set(i,r);
+                      op = removeFromArray2(op,i);
             }
 
         }
-        return null;
+        return operands[0];
     }
-public static void main(String[] args) throws IOException, ClassNotFoundException {
-        DBApp db = new DBApp();
-        db.init();
-        Vector<Record>[] arr = new Vector[4];
-        String[] op = new String[]{"AND","XOR","OR"};
+    public static Vector<Record> linearSearchTable(Table table, SQLTerm term, int x) throws IOException, ClassNotFoundException {
+        Vector<Record> records = new Vector<>();
+        for(String pageName : table.getPageNames()) {
+            Page page = DeserializePage(pageName,table.getTableName());
+            for (Record record : page.getTuples()) {
+                Object obj = record.getHm().get(term._strColumnName);
+                String y= term._strOperator;
+                //TODO: replace x with y and remove the number from method signature
+                switch (x) {
+                    case 1:
+                        if (((Comparable) obj).compareTo(term._objValue) == 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case 2:
+                        if (((Comparable) obj).compareTo(term._objValue) <= 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case 3:
+                        if (((Comparable) obj).compareTo(term._objValue) >= 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case 4:
+                        if (((Comparable) obj).compareTo(term._objValue) < 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case 5:
+                        if (((Comparable) obj).compareTo(term._objValue) > 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                }
+            }
+        }
+        return records;
+    }
+    public static Vector<Record> linearSearchTable2(Table table, SQLTerm term) throws IOException, ClassNotFoundException {
+        Vector<Record> records = new Vector<>();
+        for(String pageName : table.getPageNames()) {
+            Page page = DeserializePage(pageName,table.getTableName());
+            for (Record record : page.getTuples()) {
+                Object obj = record.getHm().get(term._strColumnName);
+                String y= term._strOperator;
+                //TODO: replace x with y and remove the number from method signature
+                switch (y) {
+                    case "=":
+                        if (((Comparable) obj).compareTo(term._objValue) == 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case "<=":
+                        if (((Comparable) obj).compareTo(term._objValue) <= 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case ">=":
+                        if (((Comparable) obj).compareTo(term._objValue) >= 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case "<":
+                        if (((Comparable) obj).compareTo(term._objValue) < 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                    case ">":
+                        if (((Comparable) obj).compareTo(term._objValue) > 0) {
+                            if(!records.contains(record))
+                                records.add(record);
+                        }
+                        ;
+                        break;
+                }
+            }
+        }
+        return records;
+    }
+
+public static void main(String[] args) throws IOException, ClassNotFoundException, DBAppException {
+        DBApp dbApp = new DBApp();
+        SQLTerm[] arrSQLTerms;
+        arrSQLTerms = new SQLTerm[3];
+        SQLTerm sql = new SQLTerm();
+        SQLTerm sql2 = new SQLTerm();
+        SQLTerm sql3 = new SQLTerm();
+        arrSQLTerms[0] = sql;
+        arrSQLTerms[1] = sql2;
+        arrSQLTerms[2] = sql3;
+        arrSQLTerms[0]._strTableName =  "Student";
+        arrSQLTerms[0]._strColumnName=  "gpa";
+        arrSQLTerms[0]._strOperator  =  "<";
+        arrSQLTerms[0]._objValue     =   77.6;
+
+        arrSQLTerms[1]._strTableName =  "Student";
+        arrSQLTerms[1]._strColumnName=  "id";
+        arrSQLTerms[1]._strOperator  =  ">";
+        arrSQLTerms[1]._objValue     =   70 ;
+
+        arrSQLTerms[2]._strTableName =  "Student";
+        arrSQLTerms[2]._strColumnName=  "gpa";
+        arrSQLTerms[2]._strOperator  =  "=";
+        arrSQLTerms[2]._objValue     =   1.6 ;
+
+        awel3alanedeef thi = new awel3alanedeef();
+
+        String[] strarrOperators = new String[2];
+        strarrOperators[0] = "AND";
+        strarrOperators[1] = "OR";
+        Iterator resultSet = thi.selectFromTable(arrSQLTerms , strarrOperators);
+        System.out.println(resultSet.toString());
+
 }
 
 }

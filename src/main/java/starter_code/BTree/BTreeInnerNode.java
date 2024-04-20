@@ -12,7 +12,7 @@ class BTreeInnerNode<TKey extends Comparable<TKey>> extends BTreeNode<TKey> impl
 	 * @uml.property name="children"
 	 */
 	protected Object[] children;
-
+	private static final long serialVersionUID = -558553967056513790L;
 	public BTreeInnerNode() {
 		this.keys = new Object[INNERORDER + 1];
 		this.children = new Object[INNERORDER + 2];

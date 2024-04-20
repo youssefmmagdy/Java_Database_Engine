@@ -5,25 +5,29 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class Table3ashankhaterSeif implements Iterator {
-    Vector<Hashtable<String, Object>> record = new Vector<>();
+    Vector<Record> record = new Vector<>();
     public Table3ashankhaterSeif() {
 
+    }
+
+    public void setRecord(Vector<Record> record) {
+        this.record = record;
     }
 
     @Override
     public String toString() {
         StringBuffer str = new StringBuffer();
-        for(Hashtable<String, Object> ht : record) {
-            str.append(ht).append(' ');
+        for(Record r : record) {
+            str.append(r.toString()).append(' ');
         }
         return  str.toString();
     }
 
-    public Vector<Hashtable<String, Object>> getRecord() {
+    public Vector<Record> getRecord() {
         return record;
     }
 
-    public void addRecord(Hashtable<String, Object> htrecord) {
+    public void addRecord(Record htrecord) {
         this.record.add(htrecord);
     }
 

@@ -1,5 +1,7 @@
 package starter_code.Main;
 
+import starter_code.Serialization.Deserialize;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -10,9 +12,10 @@ public class Record implements Serializable,Comparable<Record> {
     String tableName;
     String pageName;
     public boolean isNull;
-
-    public Record (String pageName){
+    private static final long serialVersionUID = -558553967030513790L;
+    public Record (String pageName, String tableName){
         this.pageName = pageName;
+        this.tableName = tableName;
         hm = new Hashtable<>();
         isNull=false;
     }
@@ -61,7 +64,6 @@ public class Record implements Serializable,Comparable<Record> {
     public static void main (String[] args){
 
     }
-
     @Override
     public int compareTo(Record record) {
         String pk = getPrimaryKey(tableName);

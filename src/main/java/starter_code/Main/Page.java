@@ -7,7 +7,7 @@ import java.util.Vector;
 
 
 public class Page implements Serializable{
-
+    private static final long serialVersionUID = -558553967080514790L;
     private String tableName;
     private String name;
     private Vector<Record> tuples;
@@ -51,7 +51,7 @@ public class Page implements Serializable{
         return name;
     }
     public void add(Hashtable<String, Object> ht) throws IOException, ClassNotFoundException {
-        Record r = new Record(name);
+        Record r = new Record(name, tableName);
         r.add(ht);
         tuples.add(r);
     }
@@ -64,6 +64,10 @@ public class Page implements Serializable{
         return max;
     }
 
+
+    /**
+     @param max: puts the max clustering key in the page
+     * **/
     public void setMax(Object max) {
         if(this.max == null)
             this.max = max;
@@ -84,7 +88,9 @@ public class Page implements Serializable{
     public Object getMin() {
         return min;
     }
-
+    /**
+     @param min: puts the min clustering key in the page
+      * **/
     public void setMin(Object min) {
         if(this.min == null)
             this.min = min;

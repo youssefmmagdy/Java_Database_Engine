@@ -1023,45 +1023,48 @@ public class DBApp {
 	// below method returns Iterator with result set if passed
 // strbufSQL is a select, otherwise returns null.
 	public Iterator parseSQL( StringBuffer strbufSQL ) throws DBAppException{
-		String s = strbufSQL.toString();
-		if(s.charAt(0) == 'C'){
-			String filePath = "src/main/java/test.txt";
-			try {
+			try{
+				String filePath = "src/main/java/test.txt";
 				Files.writeString(Path.of(filePath), strbufSQL + System.lineSeparator());
-			} catch (IOException e) {e.printStackTrace();}
+				CharStream cs = fromFileName(filePath);
+				SQLLexer lexer = new SQLLexer(cs);
+				CommonTokenStream token = new CommonTokenStream(lexer);
+				SQLParser parser = new SQLParser(token);
+				ParseTree tree = parser.parse();
 
+				myVisitor visitor = new myVisitor();
+				visitor.visit(tree);
+
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			return null;
 		}
-		return null;
-	}
 
 	public static void main( String[] args ){
 
 
 
-//		try{
-//			String source = "src/main/java/test.txt";
-//			CharStream cs = fromFileName(source);
-//			SQLLexer lexer = new SQLLexer(cs);
-//			CommonTokenStream token = new CommonTokenStream(lexer);
-//			SQLParser parser = new SQLParser(token);
-//			ParseTree tree = parser.parse();
-//
-//			myVisitor visitor = new myVisitor();
-//			visitor.visit(tree);
-//
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
+
 
 		try{
-//			DBApp dbApp = new DBApp();
+			DBApp dbApp = new DBApp();
 //			String strTableName = "Student";
 //			String st = "java.lang.String";
 //			String in = "java.lang.Integer";
 //			String dou = "java.lang.double";
-//			StringBuffer sqlBuffer = new StringBuffer();
-//			sqlBuffer.append("CREATE INDEX \"gpaIndex\" ON \"Student\" (\"gpa\");");
+			StringBuffer sqlBuffer = new StringBuffer();
+//			sqlBuffer.append("CREATE TABLE \"Student\" (\"id\" INT PRIMARY KEY, \"name\" STRING, \"gpa\" DOUBLE);");
+//			dbApp.parseSQL(sqlBuffer);
+//			sqlBuffer.append("CREATE INDEX \"nameIndex\" ON \"Student\" (\"name\");");
+//			dbApp.parseSQL(sqlBuffer);
+//			sqlBuffer.append("INSERT INTO \"Student\" (\"id\", \"name\", \"gpa\") VALUES (1,\"Ahmed\", 0.69), (2,\"Cyka\",0.77);");
+//			dbApp.parseSQL(sqlBuffer);
+//			sqlBuffer.append("UPDATE \"Student\" SET \"gpa\" = 0.42 ,\"name\"=\"Bober Kurwa\" WHERE \"id\" = 1;");
+//			dbApp.parseSQL(sqlBuffer);
+//			sqlBuffer.append("DELETE FROM \"Student\" WHERE \"name\" = \"Bober Kurwa\" AND \"gpa\" = 2;");
+//			dbApp.parseSQL(sqlBuffer);
+//			sqlBuffer.append("SELECT * FROM \"Student\";");
 //			dbApp.parseSQL(sqlBuffer);
 
 //			Hashtable htblColNameType = new Hashtable();
@@ -1083,10 +1086,9 @@ public class DBApp {
 //			dbApp.updateTable("Student", "K10", htblColNameValue);
 
 //			dbApp.deleteFromTable(strTableName, htblColNameValue);
-//			System.out.println(columnNameReader(strTableName+"2"));
 //			System.out.println(Deserialize.DeserializeTable("Student"));
 //			System.out.println(Deserialize.DeserializeTable("Student").getminOfPages()+" minimums");
-//			System.out.println(Deserialize.DeserializeTable("Student").getMaxOfPages()+" maximums");
+//			System.out.println(Deserialize.DeserializeTable("Student"));
 //			BTree tree = Deserialize.DeserializeTree("idIndex", "Student");
 //			System.out.println(tree);
 //			System.out.println(tree.getSize());

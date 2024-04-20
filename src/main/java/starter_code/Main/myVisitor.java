@@ -217,6 +217,7 @@ public class myVisitor extends SQLBaseVisitor {
         return visitChildren(ctx);
     }
     public Object visitCloserselect(SQLParser.CloserselectContext ctx) {
+        System.out.println(tableName);
         System.out.println(names);
         System.out.println(values);
         System.out.println(operators);
